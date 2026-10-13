@@ -337,8 +337,9 @@ function view(){
  if(!offers.length){s.innerHTML='<div class="card empty"><div>📡</div><b>نبحث عن طلبات...</b><p class="u" style="margin-top:6px">ابقَ بالقرب من المستودع لتصلك الطلبات أسرع.</p></div>';return}
  s.innerHTML='<h2 style="margin-top:0">طلبات متاحة ('+offers.length+')</h2>'+offers.map(o=>{
   const d=pos&&store?km(pos.lat,pos.lng,store.lat,store.lng):null,n=o.order_items.reduce((a,b)=>a+b.qty,0);
+  const d2=store&&o.address_lat?km(store.lat,store.lng,o.address_lat,o.address_lng):null;
   return `<div class="card offer"><div class="big">${fmt(o.courier_fee)}</div>
-  <div class="u">${esc(o.address_line)}<br>${n} منتجات${d!==null?' · المستودع يبعد '+d.toFixed(1)+' كم':''}${o.payment==='cash'?' · تحصيل كاش '+fmt(+o.total-(+o.wallet_used||0)):''}</div>
+  <div class="u">${esc(o.address_line)}<br>${n} منتجات<div style="margin-top:8px;padding:8px 10px;background:var(--surf-2,#f4f7f5);border-radius:12px;font-size:13px">📍 من موقعك إلى المستودع: <b>${d!==null?d.toFixed(1)+' كم':'—'}</b><br>🏬 من المستودع إلى العميل: <b>${d2!==null?d2.toFixed(1)+' كم':'—'}</b></div>${o.payment==='cash'?' · تحصيل كاش '+fmt(+o.total-(+o.wallet_used||0)):''}</div>
   <div class="two"><button class="btn" onclick="accept(${o.id})">قبول الطلب</button><button class="btn sec" style="color:var(--red)" onclick="rejectOffer(${o.id})">رفض</button></div></div>`}).join('')}
 
 /* ---------- خريطة الطلب الداخلية ---------- */
