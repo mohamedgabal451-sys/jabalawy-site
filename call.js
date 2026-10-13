@@ -1,7 +1,7 @@
 /* مكالمة صوتية داخل التطبيق (WebRTC مجانية، الإشارات عبر Supabase Realtime على قناة خاصة) */
 (function(){
 const ICE={iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']}]};
-let sb=null,oid=null,ch=null,pc=null,ls=null,st='idle',pending=[],timer=null;
+let sb=null,oid=null,ch=null,pc=null,ls=null,st='idle',pending=[],timer=null,readyP=null;
 const $=id=>document.getElementById(id);
 function ov(){if($('jcOv'))return $('jcOv');const d=document.createElement('div');d.id='jcOv';d.className='jc-ov hide';
  d.innerHTML='<div class="jc-box"><div class="jc-t" id="jcT"></div><div class="jc-b" id="jcB"></div><audio id="jcA" autoplay></audio></div>';document.body.appendChild(d);return d}
@@ -65,8 +65,10 @@ async function onSig(m){
  }}catch(e){cleanup('حدث خطأ في المكالمة')}
 }
 async function start(){
- if(!sb||!oid||!ch){alert('الاتصال غير متاح الآن، حاول بعد لحظات');return}
+ if(!sb||!oid||!ch||!readyP){alert('الاتصال غير متاح الآن، حاول بعد لحظات');return}
  if(st!=='idle')return;
+ const ok=await Promise.race([readyP,new Promise(r=>setTimeout(()=>r(false),6000))]);
+ if(!ok){alert('تعذّر الاتصال بقناة المكالمة، أعد تحميل الصفحة وحاول مرة أخرى');return}
  try{ls=await media()}catch(e){alert('يرجى السماح باستخدام الميكروفون من إعدادات المتصفح');return}
  st='calling';makePc();send('ring');
  show('جارٍ الاتصال...',[['إلغاء','bad',hangup]]);
@@ -90,7 +92,7 @@ async function attach(client,id){
  if(oid!==id)return;
  if(r.error||!r.data){oid=null;return}
  ch=sb.channel('call:'+id+':'+r.data,{config:{broadcast:{self:false}}});
- ch.on('broadcast',{event:'signal'},onSig).subscribe(s=>{if(s==='CHANNEL_ERROR'||s==='TIMED_OUT')console.warn('call channel',s)});
+ readyP=new Promise(res=>{ch.on('broadcast',{event:'signal'},onSig).subscribe(s=>{if(s==='SUBSCRIBED')res(true);if(s==='CHANNEL_ERROR'||s==='TIMED_OUT'){console.warn('call channel',s);res(false)}})});
 }
 window.JCall={attach:attach,start:start,hangup:hangup};
 })();
