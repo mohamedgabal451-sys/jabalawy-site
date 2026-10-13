@@ -244,14 +244,25 @@ async function login(){const {error}=await sb.auth.signInWithPassword({email:log
  if(error)return toast('تعذر الدخول: تحقق من رقم الجوال أو البريد وكلمة المرور');boot()}
 async function logout(){chatStop();if(online)await toggle();await sb.auth.signOut();$('app').classList.add('hide');$('login').classList.remove('hide')}
 async function boot(){
- const {data:{session}}=await sb.auth.getSession();
+ let {data:{session}}=await sb.auth.getSession();
+ if(!session){const rf=await sb.auth.refreshSession().catch(()=>null);session=(rf&&rf.data&&rf.data.session)||null}
  if(!session){$('login').classList.remove('hide');return}
  const p=await sb.from('profiles').select('role,full_name').eq('id',session.user.id).single();
  if(p.error||p.data.role!=='courier'){await sb.auth.signOut();$('login').classList.remove('hide');return toast('هذا الحساب ليس حساب مندوب')}
  me=session.user.id;$('hi').textContent='أهلاً '+(p.data.full_name||'يا مندوب');
  $('login').classList.add('hide');$('app').classList.remove('hide');
  const s=await sb.from('stores').select('name,lat,lng').eq('id',STORE).single();store=s.data;
- await sync();view()}
+ await sync();view();
+ try{const st=await sb.from('courier_locations').select('is_online').eq('courier_id',me).maybeSingle();if(st.data&&st.data.is_online)await resumeOnline()}catch(e){}
+}
+async function resumeOnline(){
+ if(!navigator.geolocation){await sendLoc(false);return}
+ watchId=navigator.geolocation.watchPosition(p=>{pos={lat:p.coords.latitude,lng:p.coords.longitude}},()=>{},{enableHighAccuracy:true});
+ await new Promise(r=>{let n=0;const i=setInterval(()=>{if(pos||++n>20){clearInterval(i);r()}},300)});
+ if(!pos){navigator.geolocation.clearWatch(watchId);await sendLoc(false);$('sw').classList.remove('on');$('sw').setAttribute('aria-pressed','false');$('swT').textContent='غير متصل';view();return}
+ online=true;await sendLoc(true);sendT=setInterval(()=>sendLoc(true),5000);
+ pollT=setInterval(sync,10000);listen();await sync();
+ $('sw').classList.add('on');$('sw').setAttribute('aria-pressed','true');$('swT').textContent='متصل';view()}
 
 /* ---------- الاتصال والموقع ---------- */
 async function sendLoc(on){
