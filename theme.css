@@ -522,3 +522,7 @@ body #map .leaflet-top { top: 128px; }
 .jc-b .btn{flex:1;min-width:120px}
 .jc-b .ok{background:var(--brand-2);color:#fff}
 .jc-b .bad{background:#c0392b;color:#fff}
+
+/* صفحات الدخول: الشعار في المنتصف */
+#auth .logo-lg,#login .logo-lg,.login .logo-lg{margin-left:auto;margin-right:auto}
+#login .wm,#login .wm-en,.login .wm,.login .wm-en,#login h2,.login h2{text-align:center}
