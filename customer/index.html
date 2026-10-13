@@ -120,7 +120,7 @@ body .grid .card b{font-size:12px;line-height:1.3}
 @keyframes spBar{0%{right:-45%}100%{right:100%}}
 @media (prefers-reduced-motion:reduce){#splash *,#splash{animation:none!important;transition:none!important}#splash .sp-card,#splash .sp-tag{opacity:1;transform:none}}
 </style>
-</head>
+<style id="menu-fix">#home .hero2 .htop{z-index:30}.addr-menu{z-index:60}</style></head>
 <body data-app="customer"><div id="splash" role="status" aria-label="جبلاوى"><div class="sp-glow"></div><span class="sp-ring r1"></span><span class="sp-ring r2"></span><div class="sp-card"><img class="sp-logo" src="logo-header.png" alt="جبلاوى"></div><div class="sp-tag">توصيل المقاضي خلال دقائق</div><div class="sp-bar"><i></i></div></div>
 
 <section id="auth" class="hide page" style="padding-top:18px">
@@ -254,6 +254,7 @@ const randomPw=()=>{const a='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23
 async function doEnter(){
  const p=normPhone($('em').value);
  if(!p)return toast('اكتب رقم موبايل مصرياً صحيحاً، مثل 01012345678');
+ try{localStorage.setItem('jb_phone',p)}catch(e){}
  const key='jb_pw_'+p;let pw=null;try{pw=localStorage.getItem(key)}catch(e){}
  const btn=$('bin');btn.disabled=true;
  try{
@@ -316,7 +317,8 @@ function drawStores(){
    .bindTooltip(esc(s.name)+(s.id===STORE?' · الأقرب لك':''),{direction:'top'}).addTo(SL)})}
 
 async function boot(){
- const {data:{session}}=await sb.auth.getSession();
+ let {data:{session}}=await sb.auth.getSession();
+ if(!session){try{const ph=localStorage.getItem('jb_phone'),pw=ph&&localStorage.getItem('jb_pw_'+ph);if(pw){const r=await sb.auth.signInWithPassword({email:ph+'@'+PHONE_DOMAIN,password:pw});if(!r.error)session=r.data.session}}catch(e){}}
  if(!session){user=null;WAL={balance:0,tx:[]};addrs=[];afterLogin=null;await load();return go('home')}
  user=session.user;await load();await loadWallet();
  saved={id:null,line:'',lat:null,lng:null};addr={line:'',lat:null,lng:null};addrs=[];
