@@ -256,13 +256,13 @@ async function boot(){
  try{const st=await sb.from('courier_locations').select('is_online').eq('courier_id',me).maybeSingle();if(st.data&&st.data.is_online)await resumeOnline()}catch(e){}
 }
 async function resumeOnline(){
- if(!navigator.geolocation){await sendLoc(false);return}
- watchId=navigator.geolocation.watchPosition(p=>{pos={lat:p.coords.latitude,lng:p.coords.longitude}},()=>{},{enableHighAccuracy:true});
- await new Promise(r=>{let n=0;const i=setInterval(()=>{if(pos||++n>20){clearInterval(i);r()}},300)});
- if(!pos){navigator.geolocation.clearWatch(watchId);await sendLoc(false);$('sw').classList.remove('on');$('sw').setAttribute('aria-pressed','false');$('swT').textContent='غير متصل';view();return}
- online=true;await sendLoc(true);sendT=setInterval(()=>sendLoc(true),5000);
- pollT=setInterval(sync,10000);listen();await sync();
- $('sw').classList.add('on');$('sw').setAttribute('aria-pressed','true');$('swT').textContent='متصل';view()}
+ if(!navigator.geolocation)return;
+ online=true;
+ watchId=navigator.geolocation.watchPosition(p=>{pos={lat:p.coords.latitude,lng:p.coords.longitude}},err=>{if(err&&err.code===1&&online){toast('فعّل إذن الموقع ليصلك الطلبات');toggle()}},{enableHighAccuracy:true});
+ sendT=setInterval(()=>sendLoc(true),5000);
+ pollT=setInterval(sync,10000);listen();
+ $('sw').classList.add('on');$('sw').setAttribute('aria-pressed','true');$('swT').textContent='متصل';
+ await sync();view()}
 
 /* ---------- الاتصال والموقع ---------- */
 async function sendLoc(on){
