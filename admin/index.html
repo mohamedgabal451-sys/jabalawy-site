@@ -417,9 +417,10 @@ function whForm(){
  <p class="u">يدخل الموظف بالاسم والباسورد الذي تحدده، ويفتح المستودع المرتبط بحسابه مباشرة.</p>
  <label>اسم الموظف</label><input id="wn" placeholder="مثال: أحمد - المنصورة">
  <label>اسم المستخدم (إنجليزي بدون مسافات)</label><input id="wu" dir="ltr" placeholder="mansoura" autocomplete="off">
- <label>كلمة المرور (8 أحرف على الأقل)</label><input id="wp" dir="ltr" type="text" autocomplete="new-password">
+ <label>كلمة المرور (8 أحرف على الأقل)</label><div style="display:flex;gap:8px"><input id="wp" dir="ltr" type="text" autocomplete="new-password" style="flex:1"><button type="button" class="btn sec" style="width:auto;padding:0 12px" onclick="whGen()">توليد</button></div>
  <label>المستودع</label><select id="ws">${stores.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select>
  <div class="two" style="margin-top:16px"><button class="btn" id="wsv" onclick="whSave()">إنشاء الحساب</button><button class="btn sec" onclick="closeM()">إلغاء</button></div>`)}
+function whGen(){const a='ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';const r=new Uint8Array(12);crypto.getRandomValues(r);$('wp').value=Array.from(r,b=>a[b%a.length]).join('')}
 async function whSave(){
  const u=$('wu').value.trim(),pw=$('wp').value,st=$('ws').value,nm=$('wn').value.trim();
  if(!/^[a-z0-9_]{3,30}$/i.test(u))return toast('اسم المستخدم بالإنجليزية والأرقام فقط (3 إلى 30 حرفًا)');
