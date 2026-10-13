@@ -98,8 +98,30 @@ body .grid .card b{font-size:12px;line-height:1.3}
 .am-row.am-add{color:var(--brand);font-weight:500;border-top:0.5px solid var(--line);border-radius:0;margin-top:4px}
 .hd-logo{height:50px;width:auto;max-width:150px;display:block;flex-shrink:0;object-fit:contain}
 #home .hero2 .hd-logo{height:50px}
-</style></head>
-<body data-app="customer">
+</style><style id="splash-css">
+#splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;background:#0B5D44;transition:opacity .7s ease,visibility .7s;animation:spAuto .7s 5.5s forwards}
+#splash.out{opacity:0;visibility:hidden}
+@keyframes spAuto{to{opacity:0;visibility:hidden}}
+#splash .sp-glow{position:absolute;width:140vmax;height:140vmax;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22) 0%,rgba(255,255,255,0) 60%);animation:spBreathe 2.8s ease-in-out infinite}
+@keyframes spBreathe{0%,100%{transform:scale(.85);opacity:.55}50%{transform:scale(1.08);opacity:1}}
+#splash .sp-ring{position:absolute;width:220px;height:220px;border-radius:50%;border:2px solid rgba(255,255,255,.45);animation:spRing 2.6s ease-out infinite}
+#splash .sp-ring.r2{animation-delay:1.3s}
+@keyframes spRing{0%{transform:scale(.7);opacity:.7}100%{transform:scale(2.1);opacity:0}}
+#splash .sp-card{position:relative;background:#fff;border-radius:30px;padding:22px 26px;box-shadow:0 20px 50px rgba(0,0,0,.25),0 0 0 8px rgba(255,255,255,.12);opacity:0;transform:translateY(18px) scale(.9);animation:spIn .9s cubic-bezier(.2,.8,.2,1) .15s forwards,spFloat 3.2s ease-in-out 1.1s infinite;overflow:hidden}
+#splash .sp-card::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.7),rgba(255,255,255,0));transform:skewX(-18deg);animation:spShine 3s ease-in-out 1.2s infinite}
+@keyframes spIn{to{opacity:1;transform:none}}
+@keyframes spFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes spShine{0%{left:-60%}60%,100%{left:130%}}
+#splash .sp-logo{display:block;width:210px;height:auto}
+#splash .sp-tag{position:relative;margin-top:22px;color:#fff;font-size:15px;font-weight:600;letter-spacing:.3px;opacity:0;animation:spTag .8s ease .9s forwards}
+@keyframes spTag{to{opacity:1}}
+#splash .sp-bar{position:relative;margin-top:26px;width:120px;height:4px;border-radius:99px;background:rgba(255,255,255,.25);overflow:hidden}
+#splash .sp-bar i{position:absolute;top:0;bottom:0;width:45%;border-radius:99px;background:#fff;animation:spBar 1.6s ease-in-out infinite}
+@keyframes spBar{0%{right:-45%}100%{right:100%}}
+@media (prefers-reduced-motion:reduce){#splash *,#splash{animation:none!important;transition:none!important}#splash .sp-card,#splash .sp-tag{opacity:1;transform:none}}
+</style>
+</head>
+<body data-app="customer"><div id="splash" role="status" aria-label="جبلاوى"><div class="sp-glow"></div><span class="sp-ring r1"></span><span class="sp-ring r2"></span><div class="sp-card"><img class="sp-logo" src="logo-header.png" alt="جبلاوى"></div><div class="sp-tag">توصيل المقاضي خلال دقائق</div><div class="sp-bar"><i></i></div></div>
 
 <section id="auth" class="hide page" style="padding-top:18px">
   <img class="logo-lg" src="logo.svg" alt="جبلاوى" style="width:72px;height:72px;margin-top:6px">
@@ -772,5 +794,6 @@ $('q').addEventListener('input',draw);
 if(SB_URL.startsWith('YOUR_')){go('auth');$('auth').innerHTML='<div class="empty"><div style="font-size:48px">⚙️</div><b>الإعداد مطلوب</b><p style="margin-top:8px">افتح الملف وضع SB_URL و SB_KEY من إعدادات Supabase في أعلى كود الصفحة.</p></div>'}
 else{window.__sbReady.then(function(){sb=supabase.createClient(SB_URL,SB_KEY);boot();loadSupport()}).catch(function(){})}
 </script>
-<script>if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{})</script></body>
+<script>if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{})</script><script>(function(){var s=document.getElementById('splash');if(!s)return;var t0=Date.now(),done=false;function hide(){if(done)return;done=true;var d=Math.max(0,2600-(Date.now()-t0));setTimeout(function(){s.classList.add('out');setTimeout(function(){s.remove()},750)},d)}if(document.readyState==='complete')hide();else window.addEventListener('load',hide);setTimeout(hide,6000)})();</script>
+</body>
 </html>
