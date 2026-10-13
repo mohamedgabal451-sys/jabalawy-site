@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="light">
 <head>
 <script>
 (function(){
@@ -65,7 +65,40 @@ h2{font-size:18px;padding:16px 16px 8px}
 .empty{text-align:center;color:var(--mut);padding:40px 16px}
 #toast{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--red);color:#fff;padding:10px 18px;border-radius:99px;font-size:14px;z-index:9;max-width:92%;text-align:center}
 </style>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0B5D44"><link rel="icon" type="image/png" href="favicon.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="../theme.css"><script src="../call.js" defer></script><style>.sup-ico{margin-inline-start:auto;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;color:#111;text-decoration:none;flex-shrink:0}.sup-ico svg{display:block}</style></head>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0B5D44"><link rel="icon" type="image/png" href="favicon.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="../theme.css"><script src="../call.js" defer></script><style>.sup-ico{margin-inline-start:auto;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;color:#111;text-decoration:none;flex-shrink:0}.sup-ico svg{display:block}body .hero2{background:#F4F1E8;color:var(--ink);box-shadow:0 4px 14px rgba(18,51,43,.08)}
+body .hero2 .locb{color:var(--brand)}
+body .hero2 .eta2 b{color:var(--ink)}
+body .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+body .grid .card{padding:8px}
+body .grid .card img{height:88px;object-fit:contain}
+body .grid .card b{font-size:12px;line-height:1.3}
+</style><style>
+#home .hero2 .htop{display:flex;align-items:center;gap:8px;justify-content:space-between}
+#home .hero2 .brand.bigb{margin:0;flex-shrink:0}
+#home .hero2 .brand.bigb .logo-lg{width:30px!important;height:30px!important;margin:0!important}
+#home .hero2 .brand.bigb .wm{font-size:17px;line-height:1.1}
+#home .hero2 .brand.bigb .wm-en{font-size:8px;letter-spacing:.8px}
+.addr-pill{flex:1;min-width:0;display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 10px;font:inherit;color:var(--ink);cursor:pointer;text-align:start}
+.addr-pill svg{flex-shrink:0;color:var(--brand)}
+.addr-pill .ap-t{display:flex;flex-direction:column;min-width:0;flex:1}
+.addr-pill small{font-size:10px;color:var(--mut);line-height:1.2}
+.addr-pill b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.addr-pill i{font-style:normal;color:var(--mut)}
+#home .hero2 .hm-tools{flex-shrink:0}
+#home .hero2 .hm-wal{padding:5px 8px;font-size:11px}
+#home .hero2 .hm-row2{margin-top:6px;display:flex;justify-content:space-between;align-items:center}
+.addr-wrap{position:relative;flex:1;min-width:0;display:flex}
+.addr-wrap .addr-pill{width:100%}
+.addr-menu{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);width:min(300px,92vw);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 28px rgba(0,0,0,.16);padding:6px;z-index:60;max-height:60vh;overflow:auto}
+.addr-menu.hide{display:none}
+.am-row{display:flex;flex-direction:column;align-items:flex-start;width:100%;border:0;background:none;padding:10px 12px;border-radius:10px;font:inherit;text-align:start;cursor:pointer;color:var(--ink)}
+.am-row span{font-size:14px;font-weight:500}
+.am-row small{font-size:12px;color:var(--mut);margin-top:2px;line-height:1.4}
+.am-row.on{background:#EAF3DE}
+.am-row.am-add{color:var(--brand);font-weight:500;border-top:0.5px solid var(--line);border-radius:0;margin-top:4px}
+.hd-logo{height:50px;width:auto;max-width:150px;display:block;flex-shrink:0;object-fit:contain}
+#home .hero2 .hd-logo{height:50px}
+</style></head>
 <body data-app="customer">
 
 <section id="auth" class="hide page" style="padding-top:18px">
@@ -82,10 +115,11 @@ h2{font-size:18px;padding:16px 16px 8px}
 <section id="home" class="hide">
   <div class="hero hero2">
     <div class="htop">
-      <div class="eta2"><small>يوصل خلال</small><b>15 دقيقة</b></div>
-      <div class="brand bigb"><img class="logo-lg" src="logo-big.svg" alt=""><h1 class="wm">جبلاوى</h1><div class="wm-en">JABALAWY</div></div></div>
+      <img class="hd-logo" src="logo-header.png" alt="جبلاوى">
+      <div class="addr-wrap"><button class="addr-pill" onclick="toggleAddrMenu()" aria-label="تحديد موقع التوصيل"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg><span class="ap-t"><small>التوصيل إلى</small><b id="locTxt">حدد موقع التوصيل</b></span><i>⌄</i></button><div id="addrMenu" class="addr-menu hide"></div></div>
+      <div id="hmTools" class="hm-tools"></div>
     </div>
-    <div class="hm-row2"><button class="locb" onclick="openMap()" aria-label="تحديد موقع التوصيل"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg><span>التوصيل إلى: <b id="locTxt">حدد موقع التوصيل</b></span><i>⌄</i></button><div id="hmTools" class="hm-tools"></div></div>
+    <div class="hm-row2"><div class="eta2"><small>يوصل خلال</small><b>15 دقيقة</b></div><div id="hmCart"></div></div>
     <input id="q" placeholder="ابحث عن حليب، خبز، فواكه..." aria-label="بحث">
   </div>
   <div id="hb"></div>
@@ -135,7 +169,7 @@ h2{font-size:18px;padding:16px 16px 8px}
     <div class="mad"><span class="u">العنوان على الخريطة</span><b id="maddr"></b></div>
     <p id="mwarn" class="mwarn"></p>
     <input id="mdet" placeholder="تفاصيل العنوان: رقم العمارة، الدور، الشقة" autocomplete="off">
-    <button class="cta" id="mok" onclick="mapConfirm()">تأكيد الموقع</button>
+    <button class="cta" id="mok" onclick="mapConfirm()">تأكيد العنوان</button>
   </div>
 </section>
 
@@ -278,7 +312,7 @@ function ctrl(id){if(!(stock[id]>0))return '<span class="u">نفد</span>';
  return qty(id)?`<div class="step"><button onclick="set(${id},-1)" aria-label="إنقاص">−</button><b>${qty(id)}</b><button onclick="set(${id},1)" aria-label="زيادة">+</button></div>`
  :`<button class="add" onclick="set(${id},1)" aria-label="أضف">+</button>`}
 function draw(){
- $('hmTools').innerHTML=hmTools();
+ $('hmTools').innerHTML=hmTools();$('hmCart').innerHTML=cartBtn();
  $('cats').innerHTML=C.map(c=>`<button class="chip" aria-pressed="${c===cat}" data-c="${esc(c)}">${esc(c)}</button>`).join('');
  document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{cat=b.dataset.c;draw()});
  const q=$('q').value.trim();$('hb').innerHTML=q?'':homeBlocks();
@@ -406,7 +440,7 @@ function meGo(s){meSub=s;drawMe();window.scrollTo(0,0)}
 const mtile=(ic,lb,val,on)=>`<button class="mtile" onclick="${on}"><span class="mti">${ic}</span><b>${lb}</b><small>${val}</small></button>`;
 const mrow=(ic,lb,hint,on,red)=>`<button class="mrow${red?' red':''}" onclick="${on}"><span class="mic">${ic}</span><span class="mlb">${lb}${hint?`<small>${hint}</small>`:''}</span><span class="chev" aria-hidden="true">‹</span></button>`;
 function nameP(){const {nm,ph}=meInfo();return `<div class="mcard"><label class="fl" for="mnm">الاسم</label><input id="mnm" value="${esc(nm)}" autocomplete="name"><label class="fl">رقم الجوال</label><input value="${esc(ph)}" dir="ltr" disabled><button class="cta" id="mns" onclick="saveName()">حفظ الاسم</button></div>`}
-function addrP(){return `<div class="mlist">${addrs.length?addrs.slice(0,10).map(a=>`<div class="addrc ${a.id===saved.id?'sel':''}" onclick="pickAddr('${a.id}')"><div><b>${a.id===saved.id?'الموقع الحالي':'موقع محفوظ'}</b><div class="u">${esc(a.line)}</div></div><button onclick="event.stopPropagation();delAddr('${a.id}')" aria-label="حذف" class="x">✕</button></div>`).join(''):'<p class="u" style="padding:14px">لم تضف موقعاً بعد.</p>'}</div>
+function addrP(){return `<div class="mlist">${addrs.length?addrs.slice(0,10).map(a=>`<div class="addrc ${a.id===saved.id?'sel':''}" onclick="pickAddr('${a.id}')"><div><b>${a.id===saved.id?'الموقع الحالي':(labelOf(a.line)||'موقع محفوظ')}</b><div class="u">${esc(stripLabel(a.line))}</div></div><button onclick="event.stopPropagation();delAddr('${a.id}')" aria-label="حذف" class="x">✕</button></div>`).join(''):'<p class="u" style="padding:14px">لم تضف موقعاً بعد.</p>'}</div>
  <button class="cta sec" style="margin-top:12px" onclick="openMap('me')">📍 إضافة موقع جديد على الخريطة</button>`}
 function drawMe(){
  if(!user){$('meBody').innerHTML=guestCta('me');return}
@@ -443,14 +477,15 @@ async function delAddr(id){
  addrs=addrs.filter(x=>x.id!==id);if(saved.id===id){addrs[0]?setAddr(addrs[0]):(saved={id:null,line:'',lat:null,lng:null},addr={line:'',lat:null,lng:null},updLoc())}
  drawMe()}
 function setAddr(a){saved=a;addr={line:a.line,lat:a.lat,lng:a.lng};try{localStorage.setItem('jb_addr',a.id)}catch(e){}updLoc()}
-function updLoc(){pickStore();const t=$('locTxt');if(t)t.textContent=addr.line?addr.line.split(' - ').pop().slice(0,34)||addr.line.slice(0,34):'حدد موقع التوصيل'}
+function updLoc(){pickStore();const t=$('locTxt');if(t){const lb=labelOf(addr.line),nm=stripLabel(addr.line).split(' - ').pop().slice(0,30);t.textContent=addr.line?(lb?lb+' · ':'')+(nm||addr.line.slice(0,30)):'حدد موقع التوصيل'}}
 
 /* ---------- الخريطة: تحديد موقع العميل ---------- */
 let M=null,mapPos=null,mapName='',mapBusy=false,geoT=null;
 function loadLeaflet(){return window.L?Promise.resolve():new Promise((ok,no)=>{
  const l=document.createElement('link');l.rel='stylesheet';l.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';document.head.appendChild(l);
  const s=document.createElement('script');s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';s.onload=ok;s.onerror=()=>no(new Error('map'));document.head.appendChild(s)})}
-async function openMap(){
+async function openMap(lb){
+ if(lb)mapLabel=lb;
  if(!user){toast('سجّل دخولك لتحديد موقع التوصيل');return openLogin('home')}
  $('map').classList.remove('hide');$('nav').classList.add('hide');$('bar').classList.add('hide');
  $('maddr').textContent='جاري تحميل الخريطة...';$('mdet').value='';$('mwarn').textContent='';
@@ -486,12 +521,37 @@ async function revGeo(lat,lng){
  }catch(e){}
  if(!mapPos||Math.abs(mapPos.lat-lat)>1e-7||Math.abs(mapPos.lng-lng)>1e-7)return;
  mapName=name;$('maddr').textContent=name}
+let mapLabel='منزل';
+function addrMenuHtml(){
+ const ic={'منزل':'🏠','عمل':'💼'};
+ const find=l=>addrs.find(a=>labelOf(a.line)===l);
+ let h='';
+ ['منزل','عمل'].forEach(l=>{const a=find(l);
+  h+=a?`<button class="am-row ${a.id===saved.id?'on':''}" onclick="chooseAddr('${a.id}')"><span>${ic[l]} ${l}</span><small>${esc(stripLabel(a.line))}</small></button>`
+      :`<button class="am-row" onclick="closeAddrMenu();openMap('${l}')"><span>${ic[l]} ${l}</span><small>لم تضف ${l} بعد، اضغط لتحديده على الخريطة</small></button>`});
+ addrs.filter(a=>!ic[labelOf(a.line)]).slice(0,8).forEach(a=>{h+=`<button class="am-row ${a.id===saved.id?'on':''}" onclick="chooseAddr('${a.id}')"><span>📍 ${esc(labelOf(a.line)||'موقع محفوظ')}</span><small>${esc(stripLabel(a.line))}</small></button>`});
+ h+=`<button class="am-row am-add" onclick="closeAddrMenu();openMap('أخرى')">＋ إضافة عنوان جديد</button>`;
+ return h;
+}
+function toggleAddrMenu(){
+ if(!user)return openMap();
+ const m=$('addrMenu');if(!m)return;
+ if(m.classList.contains('hide')){m.innerHTML=addrMenuHtml();m.classList.remove('hide')}else closeAddrMenu();
+}
+function closeAddrMenu(){const m=$('addrMenu');if(m)m.classList.add('hide')}
+function chooseAddr(id){
+ const a=addrs.find(x=>x.id===id);if(!a)return;
+ setAddr(a);closeAddrMenu();if(scr==='cart')drawCart();toast('تم اختيار موقع التوصيل');
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.addr-wrap'))closeAddrMenu()});
+function labelOf(l){const m=/^\[(منزل|عمل|أخرى)\]\s*/.exec(l||'');return m?m[1]:''}
+function stripLabel(l){return (l||'').replace(/^\[(منزل|عمل|أخرى)\]\s*/,'')}
 async function mapConfirm(){
  if(!mapPos||mapBusy)return;
  const det=$('mdet').value.trim();
  if(det.length<3){$('mdet').focus();return toast('اكتب تفاصيل العنوان: رقم العمارة والدور والشقة')}
  mapBusy=true;$('mok').disabled=true;
- const line=(det+' - '+(mapName||'موقع محدد على الخريطة')).slice(0,250);
+ const line=('['+mapLabel+'] '+det+' - '+(mapName||'موقع محدد على الخريطة')).slice(0,250);
  const a=await sb.from('addresses').insert({customer_id:user.id,line,lat:mapPos.lat,lng:mapPos.lng}).select().single();
  mapBusy=false;$('mok').disabled=false;
  if(a.error)return toast('تعذر حفظ الموقع، حاول مرة أخرى');
@@ -646,8 +706,11 @@ function homeBlocks(){
 }
 
 function hmTools(){
+ return `<button class="hm-wal" onclick="${user?"meGo('wallet');go('me')":"openLogin('me')"}" aria-label="المحفظة">👛 <b>${fmt(WAL.balance||0)}</b></button>`;
+}
+function cartBtn(){
  const n=cnt();
- return `<button class="hm-wal" onclick="${user?"meGo('wallet');go('me')":"openLogin('me')"}" aria-label="المحفظة">👛 <b>${fmt(WAL.balance||0)}</b></button><button class="hm-cart" onclick="go('cart')" aria-label="سلة المشتريات"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11.2a2 2 0 002 1.6h7.8a2 2 0 002-1.5L21 8H6.2"/><circle cx="9.5" cy="20.5" r="1.4"/><circle cx="17.5" cy="20.5" r="1.4"/></svg>${n?`<i>${n}</i>`:''}</button>`;
+ return `<button class="hm-cart" onclick="go('cart')" aria-label="سلة المشتريات"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11.2a2 2 0 002 1.6h7.8a2 2 0 002-1.5L21 8H6.2"/><circle cx="9.5" cy="20.5" r="1.4"/><circle cx="17.5" cy="20.5" r="1.4"/></svg>${n?`<i>${n}</i>`:''}</button>`;
 }
 
 /* ---------- بطاقة المندوب للعميل ---------- */
