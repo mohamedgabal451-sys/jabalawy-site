@@ -412,6 +412,15 @@ function drawTeam(){
  <div class="card">${L.length?L.map(u=>`<div class="row"><div class="t"><b>${esc(u.full_name||'بدون اسم')}</b><div class="u" dir="ltr" style="text-align:right">${esc(shown(u.email))}</div></div>
  <span class="pill ${u.role==='customer'?'off':''}">${ROLE[u.role]}</span>${u.role==='courier'?`<button class="btn sec" onclick="courierForm('${u.id}')">المركبة</button><button class="btn sec" onclick="courierResetPw('${u.id}','${esc(u.full_name||'')}','${esc((u.email||'').split('@')[0])}')">كلمة مرور جديدة</button>`:''}<button class="btn sec" onclick="roleForm('${u.id}')">تغيير</button></div>`).join(''):'<div class="empty">لا يوجد مستخدمون</div>'}</div>`;
  $('tq').oninput=e=>{f.tq=e.target.value;const p=e.target.selectionStart;drawTeam();$('tq').focus();$('tq').setSelectionRange(p,p)}}
+function pwForm(uid,uname){
+ modal(`<h2 style="margin-bottom:4px">تغيير كلمة مرور</h2>
+ <p class="u">الحساب: <b dir="ltr">${esc(uname)}</b></p>
+ <label>كلمة المرور الجديدة (8 أحرف على الأقل)</label><div style="display:flex;gap:8px"><input id="npw" dir="ltr" type="text" autocomplete="new-password" style="flex:1"><button type="button" class="btn sec" style="width:auto;padding:0 12px" onclick="acctGenInto('npw')">توليد</button></div>
+ <div class="two" style="margin-top:16px"><button class="btn" onclick="pwSave('${uid}')">حفظ كلمة المرور</button><button class="btn sec" onclick="closeM()">إلغاء</button></div>`)}
+function acctGenInto(fid){const a='ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';const r=new Uint8Array(12);crypto.getRandomValues(r);$(fid).value=Array.from(r,b=>a[b%a.length]).join('')}
+async function pwSave(uid){const p=$('npw').value;if(p.length<8)return toast('كلمة المرور 8 أحرف على الأقل');
+ const r=await sb.rpc('admin_set_warehouse_password',{p_user:uid,p_password:p});
+ if(r.error)return toast(r.error.message);closeM();toast('تم تغيير كلمة المرور');vSet()}
 function acctForm(preStore){
  modal(`<h2 style="margin-bottom:4px">حساب مستودع جديد</h2>
  <p class="u">يدخل الموظف بالاسم والباسورد الذي تحدده، ويفتح المستودع المرتبط بحسابه مباشرة.</p>
@@ -445,7 +454,7 @@ async function roleSave(id){
 async function vSet(){
  const lg=await sb.from('warehouse_logins').select('*');
  const logins=lg.data||[];
- $('main').innerHTML=`<div class="card"><b>المستودعات</b>${stores.map(s=>{const ls=logins.filter(x=>x.store_id===s.id);return `<div class="row"><div class="t"><b>${esc(s.name)}</b><div class="u">نطاق التوصيل ${+s.radius_km} كم</div>${ls.map(x=>`<div class="u" dir="ltr" style="text-align:right">👤 ${esc(x.username)} · 🔑 ${esc(x.password)}</div>`).join('')||'<div class="u">لا يوجد حساب دخول</div>'}</div>
+ $('main').innerHTML=`<div class="card"><b>المستودعات</b>${stores.map(s=>{const ls=logins.filter(x=>x.store_id===s.id);return `<div class="row"><div class="t"><b>${esc(s.name)}</b><div class="u">نطاق التوصيل ${+s.radius_km} كم</div>${ls.map(x=>`<div class="u" dir="ltr" style="text-align:right">👤 ${esc(x.username)} · 🔑 ${esc(x.password)} <button class="btn sec" style="width:auto;padding:2px 10px;margin:0 6px" onclick="pwForm('${x.user_id}','${esc(x.username)}')">تغيير كلمة المرور</button></div>`).join('')||'<div class="u">لا يوجد حساب دخول</div>'}</div>
   <span class="pill ${s.is_open?'':'off'}">${s.is_open?'مفتوح':'مغلق'}</span><button class="btn sec" onclick="sToggle('${s.id}')">${s.is_open?'إغلاق':'فتح'}</button><button class="btn sec" onclick="sForm('${s.id}')">تعديل</button><button class="btn sec" onclick="acctForm('${s.id}')">حساب الدخول</button></div>`}).join('')}</div>
  <div class="card"><b>الأقسام</b>${cats.map(c=>`<div class="row" style="padding-inline-start:${c.parent_id?26:0}px"><div class="e">${esc(c.emoji||'🗂️')}</div><div class="t">${c.parent_id?'↳ ':''}${esc(c.name)} <span class="u">${c.parent_id?'فرعي · ':'رئيسي · '}ترتيب ${c.sort_order}</span></div><button class="btn sec" onclick="cForm(${c.id})">تعديل</button></div>`).join('')}
  <button class="btn" style="margin-top:12px" onclick="cForm()">+ قسم جديد</button></div>`}
