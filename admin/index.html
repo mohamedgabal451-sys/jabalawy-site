@@ -48,7 +48,32 @@ main{padding:12px 16px}
 .empty{color:var(--mut);text-align:center;padding:24px}
 #toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:99px;font-size:14px;z-index:9;max-width:92%;text-align:center}
 </style>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0B5D44"><link rel="icon" type="image/png" href="favicon.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="../theme.css"></head>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0B5D44"><link rel="icon" type="image/png" href="favicon.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="../theme.css"><style id="map-css">
+.lm-wrap{display:grid;gap:12px}
+#lmMap{height:56vh;min-height:320px;border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 8px 24px rgba(18,51,43,.08)}
+.lm-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--mut)}
+.lm-bar b{color:var(--ink)}
+.lm-side{display:grid;gap:10px}
+.lm-card{background:var(--surf);border:1px solid var(--line);border-radius:16px;padding:12px}
+.lm-card .hd{display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer}
+.lm-card .hd b{font-size:15px;color:var(--ink)}
+.lm-tag{font-size:11px;font-weight:700;border-radius:99px;padding:3px 9px;background:#e6f5ec;color:#1f7a50}
+.lm-tag.stale{background:#fff1e9;color:#b5461f}
+.lm-ord{border-top:1px dashed var(--line);margin-top:10px;padding-top:10px;font-size:13px}
+.lm-ord .t{display:flex;justify-content:space-between;gap:8px;font-weight:700;color:var(--ink)}
+.lm-ord .u{color:var(--mut);margin-top:3px;line-height:1.5}
+.lm-ord ul{margin:6px 0 0;padding:0;list-style:none}
+.lm-ord li{padding:2px 0;color:var(--ink)}
+.lm-ord li.na{color:var(--mut);text-decoration:line-through}
+.lm-ord li.na::after{content:" (غير متوفر)";color:var(--red);text-decoration:none;font-size:11px}
+.lm-pin{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:#0B5D44;color:#fff;font-size:18px;box-shadow:0 4px 12px rgba(0,0,0,.25);border:3px solid #fff}
+.lm-pin.stale{background:#b5461f}
+.lm-store{width:42px;height:42px;border-radius:50%;background:#fff;border:2px solid #E8A000;box-shadow:0 4px 12px rgba(0,0,0,.25);padding:3px;box-sizing:border-box;display:block}
+.lm-pin.store{background:#E8A000;font-size:16px;width:34px;height:34px}
+.lm-pin.home{background:#fff;color:#0B5D44;border:2px solid #0B5D44;width:30px;height:30px;font-size:14px}
+.lm-empty{background:var(--surf);border:1px dashed var(--line);border-radius:16px;padding:18px;text-align:center;color:var(--mut)}
+</style>
+</head>
 <body data-app="admin">
 
 <section id="login" class="login hide">
@@ -63,6 +88,7 @@ main{padding:12px 16px}
   <header><span class="bl"><img class="mk" src="mark.svg" alt=""><span><b class="bn">جبلاوى</b><small class="en">JABALAWY</small><h1>الإدارة</h1></span></span><button onclick="logout()">خروج</button></header>
   <nav class="tabs">
     <button class="tab" data-t="sum" aria-pressed="true">الملخص</button>
+    <button class="tab" data-t="map" aria-pressed="false">الخريطة الحية</button>
     <button class="tab" data-t="prod" aria-pressed="false">المنتجات</button>
     <button class="tab" data-t="home" aria-pressed="false">الواجهة</button>
     <button class="tab" data-t="stores" aria-pressed="false">المستودعات</button>
@@ -114,7 +140,81 @@ async function loadCatalog(){
  const [c,p,s]=await Promise.all([sb.from('categories').select('*').order('sort_order'),sb.from('products').select('*').order('id'),sb.from('stores').select('*').order('name')]);
  if(c.error||p.error||s.error)return toast('تعذر تحميل البيانات');
  cats=c.data;prods=p.data;stores=s.data}
-function show(){({sum:vSum,prod:vProd,home:vHome,stores:vStores,capps:vCapps,promo:vPromo,wal:vWal,team:vTeam,set:vSet})[cur]()}
+function show(){({map:vMap,sum:vSum,prod:vProd,home:vHome,stores:vStores,capps:vCapps,promo:vPromo,wal:vWal,team:vTeam,set:vSet})[cur]()}
+
+
+/* ---------- الخريطة الحية ---------- */
+let LM=null,LMLayer=null,LMTimer=null,LMData=null;
+function loadLeafletA(){return window.L?Promise.resolve():new Promise((ok,no)=>{
+ const l=document.createElement('link');l.rel='stylesheet';l.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';document.head.appendChild(l);
+ const sc=document.createElement('script');sc.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';sc.onload=ok;sc.onerror=()=>no(new Error('map'));document.head.appendChild(sc)})}
+const minsAgo=t=>Math.floor((Date.now()-new Date(t))/60000);
+const STATUS_AR={picking:'قيد التجهيز',ready:'جاهز للاستلام',picked_up:'مع المندوب'};
+async function vMap(){
+ clearInterval(LMTimer);
+ $('main').innerHTML=`<div class="lm-wrap">
+  <div class="lm-bar"><span>المناديب المتصلون الآن: <b id="lmCnt">...</b></span><span id="lmUp" class="u"></span></div>
+  <div id="lmMap"></div>
+  <div class="lm-side" id="lmSide"><div class="lm-empty">جاري تحميل البيانات...</div></div></div>`;
+ try{await loadLeafletA()}catch(e){return toast('تعذر تحميل الخريطة. تحقق من الإنترنت')}
+ if(LM){LM.remove();LM=null}
+ LM=L.map('lmMap',{zoomControl:true}).setView([30.05,31.25],12);
+ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(LM);
+ LMLayer=L.layerGroup().addTo(LM);
+ await refreshMap(true);
+ LMTimer=setInterval(()=>{if(cur==='map')refreshMap(false)},10000);
+}
+function pinIcon(html,cls){return L.divIcon({className:'',html:`<div class="lm-pin ${cls||''}">${html}</div>`,iconSize:[38,38],iconAnchor:[19,19]})}
+async function refreshMap(fit){
+ if(!LM||cur!=='map')return;
+ const r=await sb.rpc('admin_live_map');
+ if(r.error)return toast(r.error.message||'تعذر تحميل الخريطة');
+ LMData=r.data||{stores:[],couriers:[]};
+ LMLayer.clearLayers();
+ const pts=[];
+ (LMData.stores||[]).forEach(s=>{if(s.lat==null)return;const m=[+s.lat,+s.lng];pts.push(m);
+  L.marker(m,{icon:L.divIcon({className:'',html:'<img class="lm-store" src="store-marker.png" alt="">',iconSize:[42,42],iconAnchor:[21,21]})}).bindTooltip(esc(s.name)).addTo(LMLayer)});
+ let active=0;
+ (LMData.couriers||[]).forEach(c=>{
+  const stale=minsAgo(c.updated_at)>2;
+  if(c.lat!=null){
+   const cm=[+c.lat,+c.lng];pts.push(cm);active++;
+   L.marker(cm,{icon:pinIcon('🛵',stale?'stale':'')}).bindTooltip(esc(c.name)+(stale?' (لم يتحدث منذ '+minsAgo(c.updated_at)+' د)':'')).on('click',()=>focusCourier(c.id)).addTo(LMLayer);
+  }
+  (c.orders||[]).forEach(o=>{
+   if(o.address_lat==null)return;
+   const hm=[+o.address_lat,+o.address_lng];pts.push(hm);
+   L.marker(hm,{icon:pinIcon('🏠','home')}).bindTooltip('طلب #'+o.id+' · '+esc(o.customer_name)).on('click',()=>focusCourier(c.id)).addTo(LMLayer);
+   if(c.lat!=null)L.polyline([[+c.lat,+c.lng],hm],{color:'#0B5D44',weight:3,dashArray:'6 8',opacity:.7}).addTo(LMLayer);
+  });
+ });
+ $('lmCnt').textContent=active;
+ $('lmUp').textContent='تحديث تلقائي كل 10 ثوانٍ · '+new Date().toLocaleTimeString('ar-EG',{hour:'numeric',minute:'2-digit'});
+ drawCourierList();
+ if(fit&&pts.length)LM.fitBounds(pts,{padding:[40,40],maxZoom:15});
+}
+function drawCourierList(){
+ const box=$('lmSide');if(!box||!LMData)return;
+ const cs=LMData.couriers||[];
+ if(!cs.length){box.innerHTML='<div class="lm-empty">لا يوجد مناديب متصلون الآن</div>';return}
+ box.innerHTML=cs.map(c=>{
+  const stale=minsAgo(c.updated_at)>2;
+  const orders=(c.orders||[]);
+  return `<div class="lm-card"><div class="hd" onclick="focusCourier('${c.id}')">
+    <b>🛵 ${esc(c.name)}${c.vehicle_plate?' · '+esc(c.vehicle_plate):''}</b>
+    <span class="lm-tag ${stale?'stale':''}">${stale?'موقع متأخر':'متصل'} · ${orders.length} طلب</span></div>
+   ${orders.length?orders.map(o=>`<div class="lm-ord">
+     <div class="t"><span>طلب #${o.id} · ${esc(o.customer_name)}</span><span>${fmt(o.total)}</span></div>
+     <div class="u">${STATUS_AR[o.status]||esc(o.status)} · ${o.payment==='cash'?'كاش عند الاستلام':'مدفوع مسبقاً'} · ${esc(o.store_name||'')}</div>
+     <div class="u">📍 ${esc(o.address_line||'')}</div>
+     <ul>${(o.items||[]).map(i=>`<li class="${i.unavailable?'na':''}">${esc(i.name)} × ${i.qty}</li>`).join('')}</ul>
+   </div>`).join(''):'<div class="u" style="margin-top:8px">لا توجد طلبات مع هذا المندوب حالياً</div>'}
+  </div>`}).join('');
+}
+function focusCourier(id){
+ const c=(LMData&&LMData.couriers||[]).find(x=>x.id===id);if(!c||c.lat==null||!LM)return;
+ LM.setView([+c.lat,+c.lng],15);
+}
 
 /* ---------- الملخص ---------- */
 async function vSum(){
