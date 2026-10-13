@@ -69,7 +69,7 @@ header h1{font-size:19px}header button{color:#b9d3c8;font-size:14px}
 <section id="login" class="login hide">
   <img class="logo-lg" src="logo.svg" alt="جبلاوى"><h1 class="wm">جبلاوى</h1><div class="wm-en">JABALAWY</div><h2 style="padding:0;font-size:18px;margin-bottom:4px">لوحة المستودع</h2>
   <p class="u" style="margin-bottom:18px">دخول الموظفين فقط.</p>
-  <input id="em" type="text" placeholder="رقم الجوال أو البريد الإلكتروني" autocomplete="username" dir="ltr" style="text-align:right">
+  <input id="em" type="text" placeholder="اسم المستخدم أو رقم الجوال" autocomplete="username" dir="ltr" style="text-align:right">
   <input id="pw" type="password" placeholder="كلمة المرور" autocomplete="current-password">
   <button class="cta" onclick="login()">تسجيل الدخول</button>
 </section>
@@ -119,7 +119,7 @@ function tab(t){$('orders').classList.toggle('hide',t!=='orders');$('inv').class
 /* ---------- الدخول ---------- */
 const PHONE_DOMAIN='phone.salla-sareea.app';
 function normPhone(s){s=String(s||'').trim();if(s.includes('@'))return null;const d=s.replace(/\D/g,'').replace(/^(0020|20)/,'0');return /^01[0125]\d{8}$/.test(d)?d:null}
-function loginId(v){v=String(v||'').trim();const p=normPhone(v);return p?p+'@'+PHONE_DOMAIN:v}
+function loginId(v){v=String(v||'').trim();if(v.includes('@'))return v;const p=normPhone(v);if(p)return p+'@'+PHONE_DOMAIN;return v.toLowerCase()+'@wh.jabalawy.app'}
 async function login(){const {error}=await sb.auth.signInWithPassword({email:loginId($('em').value),password:$('pw').value});
  if(error)return toast('تعذر الدخول: تحقق من رقم الجوال أو البريد وكلمة المرور');boot()}
 async function logout(){chs.forEach(c=>sb.removeChannel(c));chs=[];await sb.auth.signOut();$('app').classList.add('hide');$('login').classList.remove('hide')}
