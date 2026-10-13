@@ -3,10 +3,29 @@
 const ICE={iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']}]};
 let sb=null,oid=null,ch=null,pc=null,ls=null,st='idle',pending=[],timer=null,readyP=null;
 const $=id=>document.getElementById(id);
+let micOn=true,spkOn=true;
+function addStyle(){if($('jcCtrlCss'))return;const st=document.createElement('style');st.id='jcCtrlCss';st.textContent='.jc-ctrls{display:flex;justify-content:center;gap:22px;margin:14px 0 6px}.jc-ic{width:58px;height:58px;border-radius:50%;border:0;display:grid;place-items:center;background:rgba(255,255,255,.16);color:#fff;cursor:pointer;padding:0;box-shadow:none}.jc-ic.off{background:#fff;color:#0B5D44}.jc-ic svg{width:24px;height:24px}.jc-lbl{display:block;text-align:center;font-size:11px;color:#dff3ea;margin-top:6px}.jc-tm{display:inline-flex;align-items:center;gap:8px;margin:4px auto 10px;padding:6px 14px;border-radius:99px;background:rgba(255,255,255,.14);color:#fff;font-size:15px;font-weight:700;letter-spacing:1.5px;font-variant-numeric:tabular-nums;direction:ltr}.jc-tm.hide{display:none}.jc-tm::before{content:"";width:8px;height:8px;border-radius:50%;background:#5CE1A0;box-shadow:0 0 0 0 rgba(92,225,160,.7);animation:jcPulse 1.8s ease-out infinite}@keyframes jcPulse{0%{box-shadow:0 0 0 0 rgba(92,225,160,.7)}70%{box-shadow:0 0 0 9px rgba(92,225,160,0)}100%{box-shadow:0 0 0 0 rgba(92,225,160,0)}}@media (prefers-reduced-motion:reduce){.jc-tm::before{animation:none}}';document.head.appendChild(st)}
+const IC_MIC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+const IC_MIC_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 11.5 5.4M19 11a7 7 0 0 1-.6 2.8M12 18v3"/></svg>';
+const IC_SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+const IC_SPK_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>';
+function setMic(on){micOn=on;if(ls)ls.getAudioTracks().forEach(t=>t.enabled=on);paintCtrls()}
+function setSpk(on){spkOn=on;const a=$('jcA');if(a)a.volume=on?1:0.35;paintCtrls()}
+function paintCtrls(){const m=document.getElementById('jcMic'),k=document.getElementById('jcSpk');
+ if(m){m.innerHTML=micOn?IC_MIC:IC_MIC_OFF;m.classList.toggle('off',!micOn);m.setAttribute('aria-label',micOn?'كتم المايك':'تشغيل المايك');m.nextElementSibling.textContent=micOn?'المايك مفتوح':'المايك مغلق'}
+ if(k){k.innerHTML=spkOn?IC_SPK:IC_SPK_OFF;k.classList.toggle('off',!spkOn);k.setAttribute('aria-label',spkOn?'إيقاف مكبر الصوت':'تشغيل مكبر الصوت');k.nextElementSibling.textContent=spkOn?'مكبر الصوت':'صوت خافت'}}
+let tmrI=null,tmrT0=0;
+function startTimer(){if(tmrI)return;tmrT0=Date.now();const el=$('jcTm');if(!el)return;el.classList.remove('hide');
+ const tick=()=>{const s=Math.floor((Date.now()-tmrT0)/1000);el.textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};tick();tmrI=setInterval(tick,1000)}
+function stopTimer(){if(tmrI){clearInterval(tmrI);tmrI=null}const el=$('jcTm');if(el){el.classList.add('hide');el.textContent=''}}
+function ctrlRow(b){addStyle();const r=document.createElement('div');r.className='jc-ctrls';
+ r.innerHTML='<div><button class="jc-ic" id="jcMic" onclick="JCall.toggleMic()"></button><span class="jc-lbl"></span></div><div><button class="jc-ic" id="jcSpk" onclick="JCall.toggleSpk()"></button><span class="jc-lbl"></span></div>';
+ b.appendChild(r);paintCtrls()}
 function ov(){if($('jcOv'))return $('jcOv');const d=document.createElement('div');d.id='jcOv';d.className='jc-ov hide';
- d.innerHTML='<div class="jc-box"><div class="jc-t" id="jcT"></div><div class="jc-b" id="jcB"></div><audio id="jcA" autoplay></audio></div>';document.body.appendChild(d);return d}
+ d.innerHTML='<div class="jc-box"><div class="jc-t" id="jcT"></div><div class="jc-tm hide" id="jcTm"></div><div class="jc-b" id="jcB"></div><audio id="jcA" autoplay></audio></div>';document.body.appendChild(d);return d}
 function show(t,btns){const d=ov();d.classList.remove('hide');$('jcT').textContent=t;const b=$('jcB');b.innerHTML='';
- (btns||[]).forEach(([label,cls,fn])=>{const x=document.createElement('button');x.className='btn '+cls;x.textContent=label;x.onclick=fn;b.appendChild(x)})}
+ (btns||[]).forEach(([label,cls,fn])=>{const x=document.createElement('button');x.className='btn '+cls;x.textContent=label;x.onclick=fn;b.appendChild(x)});
+ if(st==='connected'){ctrlRow(b);startTimer()}}
 function hide(){const d=$('jcOv');if(d)d.classList.add('hide')}
 function send(type,extra){if(ch)ch.send({type:'broadcast',event:'signal',payload:Object.assign({type:type},extra||{})})}
 let ringT=null,ringAC=null;
@@ -34,7 +53,7 @@ function makePc(){
  };
 }
 async function flush(){const list=pending;pending=[];for(const c of list){try{await pc.addIceCandidate(c)}catch(e){}}}
-function cleanup(msg){stopRing();
+function cleanup(msg){stopRing();stopTimer();micOn=true;spkOn=true;const aa=$('jcA');if(aa)aa.volume=1;
  clearTimeout(timer);
  if(pc){try{pc.close()}catch(e){}}
  if(ls){ls.getTracks().forEach(t=>t.stop())}
@@ -105,5 +124,5 @@ async function attach(client,id){
  ch=sb.channel('call:'+id+':'+r.data,{config:{broadcast:{self:false}}});
  readyP=new Promise(res=>{ch.on('broadcast',{event:'signal'},onSig).subscribe(s=>{if(s==='SUBSCRIBED')res(true);if(s==='CHANNEL_ERROR'||s==='TIMED_OUT'){console.warn('call channel',s);res(false)}})});
 }
-window.JCall={attach:attach,start:start,hangup:hangup};
+window.JCall={attach:attach,start:start,hangup:hangup,toggleMic:function(){setMic(!micOn)},toggleSpk:function(){setSpk(!spkOn)}};
 })();
