@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>جبلاوى - الإدارة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media=\'all\'">
+<script>
+window.__sbReady=new Promise(function(res,rej){var urls=['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js','https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js','https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.45.4/supabase.min.js'];var i=0;function next(){if(i>=urls.length){rej(new Error('cdn'));return}var s=document.createElement('script');s.src=urls[i++];s.onload=function(){window.supabase?res():next()};s.onerror=next;document.head.appendChild(s)}next()});
+</script>
+<style>
+:root{--bg:#eef3ef;--surf:#fff;--ink:#12332b;--mut:#5d7a70;--acc:#ffc93c;--red:#e4572e;--ok:#2e9e6b;--line:#dbe5de;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1a16;--surf:#172620;--ink:#e8f2ec;--mut:#8fb0a3;--line:#27403a}}
+*{box-sizing:border-box;margin:0}
+body{font-family:Tajawal,system-ui,sans-serif;background:var(--bg);color:var(--ink);max-width:960px;margin:0 auto;padding-bottom:40px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+input,select{font:inherit;width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surf);color:var(--ink)}
+label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
+header{background:var(--ink);color:#fff;padding:16px;border-radius:0 0 24px 24px;display:flex;justify-content:space-between;align-items:center}
+header h1{font-size:19px}header button{color:#b9d3c8;font-size:14px}
+.tabs{display:flex;gap:8px;padding:14px 16px 4px;overflow-x:auto}
+.tab{flex:none;padding:9px 18px;border-radius:99px;background:var(--surf);border:1px solid var(--line);font-weight:500}
+.tab[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+main{padding:12px 16px}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:12px}
+.kpi{background:var(--surf);border:1px solid var(--line);border-radius:16px;padding:12px}
+.kpi b{display:block;font-size:26px;line-height:1.1}.kpi span{font-size:12px;color:var(--mut)}
+.bars{display:flex;align-items:flex-end;gap:8px;height:130px;margin-top:10px}
+.bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:11px;color:var(--mut)}
+.bars i{display:block;width:100%;background:var(--acc);border-radius:6px 6px 0 0;min-height:2px}
+.row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.row:last-child{border:0}.row .e{font-size:28px;width:40px;text-align:center}.row .t{flex:1;min-width:0}
+.u{color:var(--mut);font-size:13px}
+.old{text-decoration:line-through;color:var(--mut);font-size:12px;margin-inline-start:6px}
+.pill{font-size:12px;padding:2px 9px;border-radius:99px;color:#fff;background:var(--ok)}.pill.off{background:var(--mut)}.pill.red{background:var(--red)}
+.btn{padding:11px 16px;border-radius:12px;background:var(--acc);color:#12332b;font-weight:800}
+.btn.sec{background:var(--bg);color:var(--ink);font-weight:500;border:1px solid var(--line)}
+.btn:disabled{opacity:.5}
+.tools{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}.tools input{flex:2;min-width:160px}.tools select{flex:1;min-width:120px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:5}
+.sheet{background:var(--surf);width:100%;max-width:520px;border-radius:22px 22px 0 0;padding:18px;max-height:92vh;overflow:auto;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+.hide{display:none!important}
+.login{max-width:380px;margin:0 auto;padding:60px 20px}.login input{margin-bottom:10px}
+.empty{color:var(--mut);text-align:center;padding:24px}
+#toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:99px;font-size:14px;z-index:9;max-width:92%;text-align:center}
+</style>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0B5D44"><link rel="icon" type="image/png" href="favicon.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="../theme.css"></head>
+<body data-app="admin">
+
+<section id="login" class="login hide">
+  <img class="logo-lg" src="logo.svg" alt="جبلاوى"><h1 class="wm">جبلاوى</h1><div class="wm-en">JABALAWY</div><h2 style="padding:0;font-size:18px;margin-bottom:4px">لوحة الإدارة</h2>
+  <p class="u" style="margin-bottom:18px">دخول المدير فقط.</p>
+  <input id="em" type="text" placeholder="رقم الجوال أو البريد الإلكتروني" autocomplete="username" dir="ltr" style="text-align:right">
+  <input id="pw" type="password" placeholder="كلمة المرور" autocomplete="current-password">
+  <button class="btn" style="width:100%" onclick="login()">تسجيل الدخول</button>
+</section>
+
+<div id="app" class="hide">
+  <header><span class="bl"><img class="mk" src="mark.svg" alt=""><span><b class="bn">جبلاوى</b><small class="en">JABALAWY</small><h1>الإدارة</h1></span></span><button onclick="logout()">خروج</button></header>
+  <nav class="tabs">
+    <button class="tab" data-t="sum" aria-pressed="true">الملخص</button>
+    <button class="tab" data-t="prod" aria-pressed="false">المنتجات</button>
+    <button class="tab" data-t="home" aria-pressed="false">الواجهة</button>
+    <button class="tab" data-t="stores" aria-pressed="false">المستودعات</button>
+    <button class="tab" data-t="capps" aria-pressed="false">طلبات المناديب</button>
+    <button class="tab" data-t="promo" aria-pressed="false">الأكواد</button>
+    <button class="tab" data-t="wal" aria-pressed="false">المحفظة</button>
+    <button class="tab" data-t="team" aria-pressed="false">الفريق</button>
+    <button class="tab" data-t="set" aria-pressed="false">الإعدادات</button>
+  </nav>
+  <main id="main"></main>
+</div>
+<div id="modal" class="modal hide"><div class="sheet" id="sheet"></div></div>
+<div id="toast" class="hide" role="status"></div>
+
+<script>
+/* ===== الإعدادات: نفس بيانات مشروع Supabase المستخدمة في بقية التطبيقات ===== */
+const SB_URL='https://fektjanhxtmhzaiptdtt.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZla3RqYW5oeHRtaHphaXB0ZHR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExODQwMTAsImV4cCI6MjEwNjc2MDAxMH0.oRkTzZ03st-NTfZ3zioVjjC1Y_DPOKLb57n8pVfNYZA';
+/* ======================================================================= */
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>(+n).toFixed(2).replace(/\.00$/,'')+' ج.م';
+const ROLE={customer:'عميل',courier:'مندوب',staff:'موظف مستودع',admin:'مدير'};
+let sb,cur='sum',cats=[],prods=[],stores=[],team=[],f={q:'',cat:'',tq:''};
+
+function toast(m){const t=$('toast');t.textContent=m;t.classList.remove('hide');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.add('hide'),3000)}
+const modal=h=>{$('sheet').innerHTML=h;$('modal').classList.remove('hide')};
+const shown=e=>String(e||'').replace('@phone.salla-sareea.app','');
+const closeM=()=>$('modal').classList.add('hide');
+$('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeM()});
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{cur=b.dataset.t;document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-pressed',x===b));show()});
+
+/* ---------- الدخول ---------- */
+const PHONE_DOMAIN='phone.salla-sareea.app';
+function normPhone(s){s=String(s||'').trim();if(s.includes('@'))return null;const d=s.replace(/\D/g,'').replace(/^(0020|20)/,'0');return /^01[0125]\d{8}$/.test(d)?d:null}
+function loginId(v){v=String(v||'').trim();const p=normPhone(v);return p?p+'@'+PHONE_DOMAIN:v}
+async function login(){const {error}=await sb.auth.signInWithPassword({email:loginId($('em').value),password:$('pw').value});
+ if(error)return toast('تعذر الدخول: تحقق من رقم الجوال أو البريد وكلمة المرور');boot()}
+async function logout(){await sb.auth.signOut();$('app').classList.add('hide');$('login').classList.remove('hide')}
+async function boot(){
+ const {data:{session}}=await sb.auth.getSession();
+ if(!session){$('login').classList.remove('hide');return}
+ const p=await sb.from('profiles').select('role').eq('id',session.user.id).single();
+ if(p.error||p.data.role!=='admin'){await sb.auth.signOut();$('login').classList.remove('hide');return toast('هذا الحساب ليس حساب مدير')}
+ $('login').classList.add('hide');$('app').classList.remove('hide');
+ await loadCatalog();show()}
+async function loadCatalog(){
+ const [c,p,s]=await Promise.all([sb.from('categories').select('*').order('sort_order'),sb.from('products').select('*').order('id'),sb.from('stores').select('*').order('name')]);
+ if(c.error||p.error||s.error)return toast('تعذر تحميل البيانات');
+ cats=c.data;prods=p.data;stores=s.data}
+function show(){({sum:vSum,prod:vProd,home:vHome,stores:vStores,capps:vCapps,promo:vPromo,wal:vWal,team:vTeam,set:vSet})[cur]()}
+
+/* ---------- الملخص ---------- */
+async function vSum(){
+ $('main').innerHTML='<div class="empty">جاري التحميل...</div>';
+ const d0=new Date();d0.setHours(0,0,0,0);const from=new Date(d0);from.setDate(from.getDate()-6);
+ const r=await sb.from('orders').select('id,status,total,created_at,order_items(name,qty)').gte('created_at',from.toISOString()).limit(1000);
+ if(r.error)return toast('تعذر تحميل الطلبات');
+ const key=d=>new Date(d).toLocaleDateString('en-CA'),tk=key(d0);
+ const ok=r.data.filter(o=>o.status!=='cancelled'&&o.status!=='awaiting_payment'),td=ok.filter(o=>key(o.created_at)===tk);
+ const rev=td.reduce((s,o)=>s+ +o.total,0),canc=r.data.filter(o=>o.status==='cancelled'&&key(o.created_at)===tk).length;
+ const days=[...Array(7)].map((_,i)=>{const d=new Date(from);d.setDate(d.getDate()+i);const k=key(d);
+  return {l:d.toLocaleDateString('ar-EG',{weekday:'short'}),v:ok.filter(o=>key(o.created_at)===k).reduce((s,o)=>s+ +o.total,0)}});
+ const mx=Math.max(1,...days.map(x=>x.v));
+ const top={};ok.forEach(o=>o.order_items.forEach(i=>top[i.name]=(top[i.name]||0)+i.qty));
+ const T=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,5);
+ $('main').innerHTML=`<div class="kpis">
+  <div class="kpi"><b>${td.length}</b><span>طلبات اليوم</span></div>
+  <div class="kpi"><b>${fmt(rev)}</b><span>مبيعات اليوم</span></div>
+  <div class="kpi"><b>${td.length?fmt(rev/td.length):'-'}</b><span>متوسط الطلب</span></div>
+  <div class="kpi"><b>${canc}</b><span>ملغاة اليوم</span></div></div>
+ <div class="card"><b>مبيعات آخر 7 أيام</b><div class="bars">${days.map(x=>`<div><span>${x.v?Math.round(x.v):''}</span><i style="height:${x.v/mx*80}%"></i><span>${x.l}</span></div>`).join('')}</div></div>
+ <div class="card"><b>الأكثر مبيعاً (7 أيام)</b>${T.length?T.map(([n,q])=>`<div class="row"><div class="t">${esc(n)}</div><b>${q}</b></div>`).join(''):'<div class="empty">لا توجد مبيعات بعد</div>'}</div>`}
+
+/* ---------- المنتجات ---------- */
+function vProd(){
+ $('main').innerHTML=`<div class="tools"><input id="pq" placeholder="ابحث عن منتج" value="${esc(f.q)}" aria-label="بحث">
+  <select id="pc" aria-label="القسم"><option value="">كل الأقسام</option>${cats.map(c=>`<option value="${c.id}" ${f.cat==c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
+  <button class="btn" onclick="pForm()">+ منتج جديد</button><button class="btn sec" onclick="bulkForm()">خصم جماعي</button></div><div class="card" id="plist"></div>`;
+ $('pq').oninput=e=>{f.q=e.target.value;pList()};$('pc').onchange=e=>{f.cat=e.target.value;pList()};pList()}
+function pList(){
+ const L=prods.filter(p=>p.name.includes(f.q.trim())&&(!f.cat||p.category_id==f.cat));
+ $('plist').innerHTML=L.length?L.map(p=>`<div class="row">${p.image_url?`<img class="thumb" src="${esc(p.image_url)}" alt="" loading="lazy">`:`<div class="e">${esc(p.emoji||'🛒')}</div>`}
+  <div class="t"><b>${esc(p.name)}</b> <span class="u">${esc(p.unit)}</span><div>${fmt(p.price)}${p.old_price?`<span class="old">${fmt(p.old_price)}</span> <span class="pill red">خصم ${Math.round((1-p.price/p.old_price)*100)}%</span>`:''}</div></div>
+  <span class="pill ${p.is_active?'':'off'}">${p.is_active?'ظاهر':'مخفي'}</span><button class="btn sec" onclick="pForm(${p.id})">تعديل</button></div>`).join(''):'<div class="empty">لا توجد منتجات</div>'}
+function pForm(id){
+ const p=prods.find(x=>x.id===id)||{name:'',unit:'',price:'',old_price:'',emoji:'',is_active:true,category_id:cats[0]&&cats[0].id};
+ modal(`<h2 style="margin-bottom:6px">${id?'تعديل منتج':'منتج جديد'}</h2>
+ <div class="imgbox"><div id="fprev">${p.image_url?`<img src="${esc(p.image_url)}" alt="">`:`<span>${esc(p.emoji||'🛒')}</span>`}</div>
+  <div><label for="ff" class="btn sec" style="display:inline-block;cursor:pointer">${p.image_url?'تغيير الصورة':'إضافة صورة'}</label><input id="ff" type="file" accept="image/*" hidden>
+  <button class="btn sec" id="frm" type="button" ${p.image_url?'':'hidden'}>إزالة</button><div class="u" id="fmsg">صورة مربعة بخلفية واضحة تعمل أفضل. يتم تصغيرها تلقائياً.</div></div></div>
+ <label>الاسم</label><input id="fn" value="${esc(p.name)}">
+ <div class="two"><div><label>الوحدة (مثل 1 لتر)</label><input id="fu" value="${esc(p.unit)}"></div><div><label>رمز تعبيري</label><input id="fe" value="${esc(p.emoji)}" maxlength="4"></div></div>
+ <div class="two"><div><label>السعر (ج.م)</label><input id="fp" type="number" min="0" step="0.5" value="${esc(p.price)}"></div>
+ <div><label>السعر قبل الخصم (اختياري)</label><input id="fo" type="number" min="0" step="0.5" value="${esc(p.old_price??'')}"></div></div>
+ <label>نسبة الخصم % <span class="u">(اكتبها ويُحسب السعر تلقائياً)</span></label><input id="fd" type="number" min="0" max="90" step="1" placeholder="مثال: 20" value="${p.old_price?Math.round((1-p.price/p.old_price)*100):''}">
+ <label>القسم</label><select id="fc">${cats.map(c=>`<option value="${c.id}" ${p.category_id==c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
+ <label style="display:flex;gap:8px;align-items:center;margin-top:14px;color:var(--ink)"><input type="checkbox" id="fa" style="width:auto" ${p.is_active?'checked':''}> ظاهر للعملاء</label>
+ <p class="u" style="margin:10px 0">لا يمكن حذف منتج سبق طلبه. أخفِه بإلغاء "ظاهر للعملاء". كمية المخزون تُضبط من لوحة المستودع.</p>
+ <div class="two"><button class="btn" id="sv" onclick="pSave(${id||0})">حفظ</button><button class="btn sec" onclick="closeM()">إلغاء</button></div>`);
+ imgUrl=p.image_url||null;
+ $('fd').oninput=discCalc;
+ $('fp').oninput=()=>{if($('fo').value!==''){const o=+$('fo').value,pr=+$('fp').value;$('fd').value=o>pr&&pr>=0?Math.round((1-pr/o)*100):''}};
+ $('fo').oninput=$('fp').oninput;
+ $('ff').onchange=imgPick;
+ $('frm').onclick=()=>{imgUrl=null;$('fprev').innerHTML='<span>'+esc($('fe').value||'🛒')+'</span>';$('frm').hidden=true};}
+let imgUrl=null;
+function discCalc(){
+ const d=parseFloat($('fd').value);
+ if(!(d>0)){ if($('fo').value!==''){$('fp').value=$('fo').value;$('fo').value=''} return }
+ const base=$('fo').value!==''?+$('fo').value:+$('fp').value;
+ if(!(base>0))return toast('اكتب السعر أولاً');
+ $('fo').value=base;$('fp').value=(Math.round(base*(1-Math.min(d,90)/100)*100)/100)}
+/* تصغير الصورة في المتصفح ثم رفعها إلى مخزن الصور */
+function shrink(file,max=800){return new Promise((res,rej)=>{const im=new Image(),u=URL.createObjectURL(file);
+ im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),w=Math.round(im.width*k),h=Math.round(im.height*k),c=document.createElement('canvas');
+  c.width=w;c.height=h;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);URL.revokeObjectURL(u);
+  c.toBlob(b=>b?res(b):rej(new Error('تعذر تجهيز الصورة')),'image/jpeg',.82)};
+ im.onerror=()=>rej(new Error('ملف الصورة غير صالح'));im.src=u})}
+async function imgPick(e){
+ const file=e.target.files[0];if(!file)return;
+ if(!/^image\//.test(file.type))return toast('اختر ملف صورة');
+ $('fmsg').textContent='جاري الرفع...';$('sv').disabled=true;
+ try{
+  const blob=await shrink(file),path='p'+Date.now()+'-'+Math.random().toString(36).slice(2,7)+'.jpg';
+  const up=await sb.storage.from('products').upload(path,blob,{contentType:'image/jpeg',cacheControl:'31536000'});
+  if(up.error)throw up.error;
+  imgUrl=sb.storage.from('products').getPublicUrl(path).data.publicUrl;
+  $('fprev').innerHTML='<img src="'+esc(imgUrl)+'" alt="">';$('frm').hidden=false;$('fmsg').textContent='تم رفع الصورة. اضغط حفظ لتثبيتها.';
+ }catch(err){$('fmsg').textContent='تعذر رفع الصورة: '+(err.message||'')}
+ $('sv').disabled=false;e.target.value=''}
+async function pSave(id){
+ const name=$('fn').value.trim(),price=parseFloat($('fp').value),old=$('fo').value===''?null:parseFloat($('fo').value);
+ if(!name)return toast('اكتب اسم المنتج');
+ if(!(price>=0))return toast('اكتب سعراً صحيحاً');
+ if(old!==null&&!(old>price))return toast('السعر قبل الخصم يجب أن يكون أكبر من السعر');
+ const o={name,unit:$('fu').value.trim(),emoji:$('fe').value.trim()||null,price,old_price:old,category_id:+$('fc').value,is_active:$('fa').checked,image_url:imgUrl};
+ $('sv').disabled=true;
+ const r=id?await sb.from('products').update(o).eq('id',id):await sb.from('products').insert(o);
+ if(r.error){$('sv').disabled=false;return toast('تعذر الحفظ: '+r.error.message)}
+ closeM();toast('تم الحفظ');await loadCatalog();vProd()}
+
+/* ---------- خصم جماعي ---------- */
+function bulkForm(){
+ modal(`<h2 style="margin-bottom:6px">خصم جماعي</h2>
+ <p class="u" style="margin-bottom:8px">يُحسب الخصم من السعر الأصلي، فتطبيقه مرة ثانية لا يضاعف الخصم. اكتب 0 لإلغاء الخصم وإرجاع الأسعار.</p>
+ <label>القسم</label><select id="bc"><option value="">كل المنتجات</option>${cats.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select>
+ <label>نسبة الخصم %</label><input id="bp" type="number" min="0" max="90" step="1" placeholder="مثال: 15">
+ <div class="two" style="margin-top:16px"><button class="btn" id="sv" onclick="bulkSave()">تطبيق</button><button class="btn sec" onclick="closeM()">إلغاء</button></div>`)}
+async function bulkSave(){
+ const pc=parseFloat($('bp').value);if(!(pc>=0&&pc<=90))return toast('اكتب نسبة من 0 إلى 90');
+ const cat=$('bc').value===''?null:+$('bc').value;$('sv').disabled=true;
+ const r=await sb.rpc('admin_bulk_discount',{p_category:cat,p_percent:pc});
+ if(r.error){$('sv').disabled=false;return toast(r.error.message)}
+ closeM();toast(pc?`تم تطبيق خصم ${pc}% على ${r.data} منتج`:`تم إلغاء الخصم عن ${r.data} منتج`);await loadCatalog();vProd()}
+
+/* ---------- أكواد الخصم ---------- */
+let promos=[],promoUse={};
+async function vPromo(){
+ $('main').innerHTML='<div class="empty">جاري التحميل...</div>';
+ const [a,b]=await Promise.all([sb.from('promo_codes').select('*').order('created_at',{ascending:false}),sb.from('orders').select('promo_code,discount,status').not('promo_code','is',null).limit(2000)]);
+ if(a.error)return toast('تعذر تحميل الأكواد');
+ promos=a.data;promoUse={};(b.data||[]).filter(o=>o.status!=='cancelled').forEach(o=>{const u=promoUse[o.promo_code]||(promoUse[o.promo_code]={n:0,d:0});u.n++;u.d+=+o.discount});
+ drawPromo()}
+const pDesc=c=>(c.kind==='percent'?c.value+'%'+(c.max_discount?` (حتى ${fmt(c.max_discount)})`:''):fmt(c.value))+(c.min_subtotal>0?` · من ${fmt(c.min_subtotal)}`:'')+(c.first_order_only?' · أول طلب فقط':'');
+function drawPromo(){
+ const day=d=>d?new Date(d).toLocaleDateString('ar-EG'):'';
+ $('main').innerHTML=`<div class="tools"><button class="btn" onclick="promoForm()">+ كود جديد</button></div>
+ <div class="card">${promos.length?promos.map(c=>{const u=promoUse[c.code]||{n:0,d:0},ex=c.expires_at&&new Date(c.expires_at)<new Date();
+  return `<div class="row"><div class="t"><b dir="ltr" style="letter-spacing:1px">${esc(c.code)}</b><div class="u">${esc(pDesc(c))}</div>
+  <div class="u">استُخدم ${u.n} مرة · خصم ${fmt(u.d)}${c.usage_limit?` · الحد ${c.usage_limit}`:''}${c.expires_at?` · ${ex?'انتهى':'ينتهي'} ${day(c.expires_at)}`:''}</div></div>
+  <span class="pill ${c.active&&!ex?'':'off'}">${ex?'منتهي':c.active?'فعّال':'موقوف'}</span><button class="btn sec" onclick="promoForm('${esc(c.code)}')">تعديل</button></div>`}).join(''):'<div class="empty">لا توجد أكواد بعد</div>'}</div>`}
+function promoForm(code){
+ const c=promos.find(x=>x.code===code)||{code:'',kind:'percent',value:'',max_discount:'',min_subtotal:0,first_order_only:true,one_per_customer:true,usage_limit:'',active:true,expires_at:null};
+ const ex=c.expires_at?new Date(c.expires_at).toLocaleDateString('en-CA'):'';
+ modal(`<h2 style="margin-bottom:6px">${code?'تعديل كود':'كود جديد'}</h2>
+ <label>الكود (حروف إنجليزية وأرقام)</label><input id="pcode" dir="ltr" style="text-align:right;text-transform:uppercase" value="${esc(c.code)}" ${code?'readonly':''} maxlength="30" placeholder="WELCOME15">
+ <div class="two"><div><label>نوع الخصم</label><select id="pk"><option value="percent" ${c.kind==='percent'?'selected':''}>نسبة %</option><option value="fixed" ${c.kind==='fixed'?'selected':''}>مبلغ ثابت ج.م</option></select></div>
+ <div><label>القيمة</label><input id="pv" type="number" min="1" step="1" value="${esc(c.value)}"></div></div>
+ <div class="two"><div><label>أقصى خصم ج.م (للنسبة)</label><input id="pm" type="number" min="0" step="1" value="${esc(c.max_discount??'')}" placeholder="بلا حد"></div>
+ <div><label>أقل قيمة للطلب ج.م</label><input id="pn" type="number" min="0" step="1" value="${esc(c.min_subtotal)}"></div></div>
+ <div class="two"><div><label>عدد مرات الاستخدام الكلي</label><input id="pl" type="number" min="1" step="1" value="${esc(c.usage_limit??'')}" placeholder="بلا حد"></div>
+ <div><label>تاريخ الانتهاء</label><input id="pe" type="date" value="${ex}"></div></div>
+ <label style="display:flex;gap:8px;align-items:center;margin-top:12px;color:var(--ink)"><input type="checkbox" id="pf" style="width:auto" ${c.first_order_only?'checked':''}> لأول طلب للعميل فقط</label>
+ <label style="display:flex;gap:8px;align-items:center;margin-top:8px;color:var(--ink)"><input type="checkbox" id="po" style="width:auto" ${c.one_per_customer?'checked':''}> مرة واحدة لكل عميل</label>
+ <label style="display:flex;gap:8px;align-items:center;margin-top:8px;color:var(--ink)"><input type="checkbox" id="pa" style="width:auto" ${c.active?'checked':''}> فعّال</label>
+ <div class="two" style="margin-top:16px"><button class="btn" id="sv" onclick="promoSave('${code?esc(code):''}')">حفظ</button><button class="btn sec" onclick="closeM()">إلغاء</button></div>
+ ${code?`<button class="btn sec" style="width:100%;margin-top:10px;color:var(--red)" onclick="promoDel('${esc(code)}')">حذف الكود</button>`:''}`)}
+async function promoSave(old){
+ const code=$('pcode').value.trim().toUpperCase(),kind=$('pk').value,value=parseFloat($('pv').value);
+ if(!/^[A-Z0-9_-]{3,30}$/.test(code))return toast('الكود: 3 إلى 30 حرفاً إنجليزياً أو أرقاماً');
+ if(!(value>0)||(kind==='percent'&&value>100))return toast('تحقق من قيمة الخصم');
+ const num=id=>$(id).value===''?null:parseFloat($(id).value);
+ const o={code,kind,value,max_discount:kind==='percent'?num('pm'):null,min_subtotal:num('pn')||0,usage_limit:$('pl').value===''?null:parseInt($('pl').value),
+  expires_at:$('pe').value?new Date($('pe').value+'T23:59:59').toISOString():null,first_order_only:$('pf').checked,one_per_customer:$('po').checked,active:$('pa').checked};
+ $('sv').disabled=true;
+ const r=old?await sb.from('promo_codes').update(o).eq('code',old):await sb.from('promo_codes').insert(o);
+ if(r.error){$('sv').disabled=false;return toast(r.error.code==='23505'?'هذا الكود موجود من قبل':'تعذر الحفظ: '+r.error.message)}
+ closeM();toast('تم الحفظ');vPromo()}
+async function promoDel(code){
+ if(!confirm('حذف الكود '+code+'؟ الطلبات السابقة لا تتأثر.'))return;
+ const r=await sb.from('promo_codes').delete().eq('code',code);
+ if(r.error)return toast('تعذر الحذف');closeM();toast('تم الحذف');vPromo()}
+
+/* ---------- شحن المحافظ ---------- */
+async function vWal(){
+ $('main').innerHTML=`<div class="card"><b>شحن محفظة عميل</b>
+ <p class="u" style="margin:6px 0 10px">اكتب رقم جوال العميل واضغط بحث، ثم تأكد من اسمه قبل الشحن. اشحن المحفظة بعد استلام المبلغ نقداً.</p>
+ <div class="tools" style="margin:0"><input id="wp" dir="ltr" style="text-align:right" placeholder="01xxxxxxxxx" inputmode="numeric"><button class="btn sec" onclick="walLookup()">بحث</button></div>
+ <div id="wres"></div></div>
+ <div class="card"><b>آخر عمليات الشحن</b><div id="wlist"><div class="empty">جاري التحميل...</div></div></div>`;
+ $('wp').onkeydown=e=>{if(e.key==='Enter')walLookup()};
+ walRecent()}
+async function walLookup(){
+ const p=normPhone($('wp').value);if(!p)return toast('اكتب رقم جوال صحيحاً');
+ const r=await sb.rpc('admin_wallet_lookup',{p_phone:p});
+ if(r.error)return toast(r.error.message);
+ const d=r.data;
+ $('wres').innerHTML=`<div class="row" style="margin-top:12px"><div class="t"><b>${esc(d.name||'بدون اسم')}</b><div class="u" dir="ltr" style="text-align:right">${esc(p)}</div><div>الرصيد الحالي: <b>${fmt(d.balance)}</b></div></div></div>
+ <label>المبلغ (ج.م)</label><input id="wa" type="number" min="1" max="5000" step="1" placeholder="مثال: 100">
+ <label>ملاحظة (اختياري)</label><input id="wn" maxlength="120" placeholder="مثال: دفع نقداً في المستودع">
+ <button class="btn" id="wb" onclick="walTopup('${p}',${+d.balance})">شحن المحفظة</button>`}
+async function walTopup(p,before){
+ const a=parseFloat($('wa').value);if(!(a>0))return toast('اكتب مبلغاً صحيحاً');
+ if(!confirm('تأكيد شحن '+a+' ج.م لهذا العميل؟'))return;
+ $('wb').disabled=true;
+ const r=await sb.rpc('admin_wallet_topup',{p_phone:p,p_amount:a,p_note:$('wn').value});
+ if(r.error){$('wb').disabled=false;return toast(r.error.message)}
+ toast('تم الشحن. الرصيد الآن '+fmt(r.data.balance));
+ $('wp').value=p;walLookup();walRecent()}
+async function walRecent(){
+ const r=await sb.from('wallet_tx').select('amount,note,created_at,profiles(full_name)').eq('kind','topup_manual').order('id',{ascending:false}).limit(20);
+ if(r.error){$('wlist').innerHTML='<div class="empty">تعذر التحميل</div>';return}
+ $('wlist').innerHTML=r.data.length?r.data.map(t=>`<div class="row"><div class="t"><b>${esc((t.profiles&&t.profiles.full_name)||'عميل')}</b><div class="u">${esc(t.note||'')} ${esc(new Date(t.created_at).toLocaleString('ar-EG',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}))}</div></div><b>+${fmt(t.amount)}</b></div>`).join(''):'<div class="empty">لا توجد عمليات شحن بعد</div>'}
+
+/* ---------- الفريق ---------- */
+async function vTeam(){
+ $('main').innerHTML='<div class="empty">جاري التحميل...</div>';
+ const r=await sb.rpc('admin_users');
+ if(r.error)return toast(r.error.message.includes('admin_users')?'نفّذ ملف admin.sql أولاً':r.error.message);
+ team=r.data;drawTeam()}
+function drawTeam(){
+ const q=f.tq.trim().toLowerCase(),L=team.filter(u=>(u.email||'').toLowerCase().includes(q)||(u.full_name||'').toLowerCase().includes(q));
+ const ord={admin:0,staff:1,courier:2,customer:3};L.sort((a,b)=>ord[a.role]-ord[b.role]);
+ $('main').innerHTML=`<div class="tools"><input id="tq" placeholder="ابحث بالبريد أو الاسم" value="${esc(f.tq)}" aria-label="بحث"></div>
+ <div class="card">${L.length?L.map(u=>`<div class="row"><div class="t"><b>${esc(u.full_name||'بدون اسم')}</b><div class="u" dir="ltr" style="text-align:right">${esc(shown(u.email))}</div></div>
+ <span class="pill ${u.role==='customer'?'off':''}">${ROLE[u.role]}</span>${u.role==='courier'?`<button class="btn sec" onclick="courierForm('${u.id}')">المركبة</button><button class="btn sec" onclick="courierResetPw('${u.id}','${esc(u.full_name||'')}','${esc((u.email||'').split('@')[0])}')">كلمة مرور جديدة</button>`:''}<button class="btn sec" onclick="roleForm('${u.id}')">تغيير</button></div>`).join(''):'<div class="empty">لا يوجد مستخدمون</div>'}</div>`;
+ $('tq').oninput=e=>{f.tq=e.target.value;const p=e.target.selectionStart;drawTeam();$('tq').focus();$('tq').setSelectionRange(p,p)}}
+function roleForm(id){
+ const u=team.find(x=>x.id===id);
+ modal(`<h2 style="margin-bottom:4px">${esc(u.full_name||shown(u.email))}</h2><p class="u" dir="ltr" style="text-align:right">${esc(shown(u.email))}</p>
+ <label>الدور</label><select id="rr" onchange="$('rs').parentElement.classList.toggle('hide',this.value!=='staff')">${Object.entries(ROLE).map(([k,v])=>`<option value="${k}" ${u.role===k?'selected':''}>${v}</option>`).join('')}</select>
+ <div class="${u.role==='staff'?'':'hide'}"><label>المستودع</label><select id="rs">${stores.map(s=>`<option value="${s.id}" ${u.store_id===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></div>
+ <div class="two" style="margin-top:16px"><button class="btn" id="sv" onclick="roleSave('${id}')">حفظ</button><button class="btn sec" onclick="closeM()">إلغاء</button></div>`)}
+async function roleSave(id){
+ const role=$('rr').value;$('sv').disabled=true;
+ const r=await sb.rpc('admin_set_role',{p_user:id,p_role:role,p_store:role==='staff'?$('rs').value:null});
+ if(r.error){$('sv').disabled=false;return toast(r.error.message)}
+ closeM();toast('تم تحديث الدور');vTeam()}
+
+/* ---------- الإعدادات ---------- */
+function vSet(){
+ $('main').innerHTML=`<div class="card"><b>المستودعات</b>${stores.map(s=>`<div class="row"><div class="t"><b>${esc(s.name)}</b><div class="u">نطاق التوصيل ${+s.radius_km} كم</div></div>
+  <span class="pill ${s.is_open?'':'off'}">${s.is_open?'مفتوح':'مغلق'}</span><button class="btn sec" onclick="sToggle('${s.id}')">${s.is_open?'إغلاق':'فتح'}</button><button class="btn sec" onclick="sForm('${s.id}')">تعديل</button></div>`).join('')}</div>
+ <div class="card"><b>الأقسام</b>${cats.map(c=>`<div class="row" style="padding-inline-start:${c.parent_id?26:0}px"><div class="e">${esc(c.emoji||'🗂️')}</div><div class="t">${c.parent_id?'↳ ':''}${esc(c.name)} <span class="u">${c.parent_id?'فرعي · ':'رئيسي · '}ترتيب ${c.sort_order}</span></div><button class="btn sec" onclick="cForm(${c.id})">تعديل</button></div>`).join('')}
+ <button class="btn" style="margin-top:12px" onclick="cForm()">+ قسم جديد</button></div>`}
+async function sToggle(id){const s=stores.find(x=>x.id===id);
+ if(s.is_open&&!confirm('إغلاق المستودع؟ لن يستطيع العملاء إرسال طلبات جديدة.'))return;
+ const r=await sb.from('stores').update({is_open:!s.is_open}).eq('id',id);
+ if(r.error)return toast('تعذر التحديث');await loadCatalog();vSet()}
+function sForm(id){const s=stores.find(x=>x.id===id);
+ modal(`<h2 style="margin-bottom:6px">تعديل المستودع</h2><label>الاسم</label><input id="sn" value="${esc(s.name)}">
+ <label>نطاق التوصيل (كم)</label><input id="sr" type="number" min="0.5" step="0.5" value="${+s.radius_km}">
+ <div class="two" style="margin-top:16px"><button class="btn" id="sv" onclick="sSave('${id}')">حفظ</button><button class="btn sec" onclick="closeM()">إلغاء</button></div>`)}
+async function sSave(id){const n=$('sn').value.trim(),r=parseFloat($('sr').value);
+ if(!n||!(r>0))return toast('تحقق من الاسم والنطاق');
+ const x=await sb.from('stores').update({name:n,radius_km:r}).eq('id',id);
+ if(x.error)return toast('تعذر الحفظ');closeM();toast('تم الحفظ');await loadCatalog();vSet()}
+function cForm(id){
+ const c=cats.find(x=>x.id===id)||{name:'',sort_order:(Math.max(0,...cats.map(x=>x.sort_order))+1),parent_id:null,emoji:'',image_url:null};
+ imgCat=c.image_url||null;
+ const opts=cats.filter(x=>x.id!==id&&!x.parent_id).map(x=>`<option value="${x.id}" ${c.parent_id===x.id?'selected':''}>${esc(x.name)}</option>`).join('');
+ modal(`<h2 style="margin-bottom:6px">${id?'تعديل قسم':'قسم جديد'}</h2>
+ <div class="imgbox"><div id="cprev">${c.image_url?`<img src="${esc(c.image_url)}" alt="">`:`<span>${esc(c.emoji||'🗂️')}</span>`}</div>
+  <div><label for="cf" class="btn sec" style="display:inline-block;cursor:pointer">${c.image_url?'تغيير الصورة':'إضافة صورة'}</label><input id="cf" type="file" accept="image/*" hidden>
+  <button class="btn sec" id="crm" type="button" ${c.image_url?'':'hidden'}>إزالة</button><div class="u" id="cmsg">تظهر للعميل في شاشة التصنيفات.</div></div></div>
+ <label>الاسم</label><input id="cn" value="${esc(c.name)}">
+ <div class="two"><div><label>رمز تعبيري (يظهر إن لم توجد صورة)</label><input id="ce" value="${esc(c.emoji||'')}" maxlength="4"></div>
+ <div><label>الترتيب (الأصغر أولاً)</label><input id="co" type="number" step="1" value="${c.sort_order}"></div></div>
+ <label>يتفرع من قسم</label><select id="cp"><option value="">— قسم رئيسي —</option>${opts}</select>
+ <p class="u" style="margin:8px 0">الأقسام الرئيسية تظهر في شاشة التصنيفات، والفرعية تظهر داخل الرئيسي. المنتجات تُضاف للقسم الأخير.</p>
+ <div class="two" style="margin-top:16px"><button class="btn" id="sv" onclick="cSave(${id||0})">حفظ</button><button class="btn sec" onclick="closeM()">إلغاء</button></div>`);
+ $('cf').onchange=catImgPick;
+ $('crm').onclick=()=>{imgCat=null;$('cprev').innerHTML=`<span>${esc($('ce').value||'🗂️')}</span>`;$('crm').hidden=true}}
+let imgCat=null;
+async function catImgPick(e){
+ const file=e.target.files[0];if(!file)return;
+ if(!/^image\//.test(file.type))return toast('اختر ملف صورة');
+ $('cmsg').textContent='جاري الرفع...';$('sv').disabled=true;
+ try{
+  const blob=await shrink(file,600),path='c'+Date.now()+'-'+Math.random().toString(36).slice(2,7)+'.jpg';
+  const up=await sb.storage.from('products').upload(path,blob,{contentType:'image/jpeg',cacheControl:'31536000'});
+  if(up.error)throw up.error;
+  imgCat=sb.storage.from('products').getPublicUrl(path).data.publicUrl;
+  $('cprev').innerHTML='<img src="'+esc(imgCat)+'" alt="">';$('crm').hidden=false;$('cmsg').textContent='تم رفع الصورة. اضغط حفظ لتثبيتها.';
+ }catch(err){$('cmsg').textContent='تعذر رفع الصورة: '+(err.message||'')}
+ $('sv').disabled=false;e.target.value=''}
+async function cSave(id){
+ const o={name:$('cn').value.trim(),sort_order:parseInt($('co').value)||0,emoji:$('ce').value.trim()||null,image_url:imgCat,parent_id:$('cp').value?+$('cp').value:null};
+ if(!o.name)return toast('اكتب اسم القسم');
+ if(o.parent_id&&id&&cats.some(x=>x.parent_id===id))return toast('هذا القسم له أقسام فرعية، لا يمكن جعله فرعياً');
+ const r=id?await sb.from('categories').update(o).eq('id',id):await sb.from('categories').insert(o);
+ if(r.error)return toast('تعذر الحفظ: '+r.error.message);
+ closeM();toast('تم الحفظ');await loadCatalog();vSet()}
+
+/* ---------- واجهة التطبيق الرئيسية ---------- */
+let tiles=[],imgTile=null;
+const TK={hero:'بانر كبير (سحب أفقي)',promo:'بطاقة عروض (سحب أفقي)',banner:'بانر عريض'};
+async function vHome(){
+ $('main').innerHTML='<div class="empty">جاري التحميل...</div>';
+ const r=await sb.from('home_tiles').select('*').order('kind').order('sort_order');
+ if(r.error)return toast('تعذر تحميل الواجهة');
+ tiles=r.data||[];
+ $('main').innerHTML=`<div class="tools"><button class="btn" onclick="tileForm()">+ بلوك جديد</button></div>
+ <div class="card"><p class="u" style="margin-bottom:6px">البلوكات أعلى الصفحة الرئيسية للعميل. الأقسام وصورها تُدار من الإعدادات، والخصومات من المنتجات.</p>
+ ${tiles.length?tiles.map(t=>`<div class="row" style="${t.is_active?'':'opacity:.5'}">
+   <div class="e" style="width:44px;height:44px;border-radius:10px;background:${esc(t.bg)} ${t.image_url?`url('${esc(t.image_url)}') center/cover`:''}"></div>
+   <div class="t"><b>${esc(t.title)}</b><div class="u">${TK[t.kind]||t.kind} · ${t.link_type==='offers'?'يفتح منطقة العروض':t.link_type==='category'?'يفتح قسماً':'بدون رابط'}${t.is_active?'':' · مخفي'}</div></div>
+   <button class="btn sec" onclick="tileForm(${t.id})">تعديل</button></div>`).join(''):'<div class="empty">لا توجد بلوكات. أضف أول بلوك.</div>'}</div>`}
+function tileForm(id){
+ const t=tiles.find(x=>x.id===id)||{kind:'hero',title:'',subtitle:'',bg:'#FFE08A',image_url:null,link_type:'offers',link_id:null,sort_order:(Math.max(0,...tiles.map(x=>x.sort_order))+1),is_active:true};
+ imgTile=t.image_url||null;
+ const catOpts=cats.filter(c=>!c.parent_id).map(c=>`<option value="${c.id}" ${t.link_id===c.id?'selected':''}>${esc(c.name)}</option>`).join('');
+ modal(`<h2 style="margin-bottom:6px">${id?'تعديل بلوك':'بلوك جديد'}</h2>
+ <div class="imgbox"><div id="tprev" style="background:${esc(t.bg)}">${t.image_url?`<img src="${esc(t.image_url)}" alt="">`:'<span>🖼️</span>'}</div>
+  <div><label for="tf" class="btn sec" style="display:inline-block;cursor:pointer">${t.image_url?'تغيير الصورة':'إضافة صورة'}</label><input id="tf" type="file" accept="image/*" hidden>
+  <button class="btn sec" id="trm" type="button" ${t.image_url?'':'hidden'}>إزالة</button><div class="u" id="tmsg">اختيارية. تظهر فوق لون الخلفية.</div></div></div>
+ <label>النوع</label><select id="tk">${Object.entries(TK).map(([k,v])=>`<option value="${k}" ${t.kind===k?'selected':''}>${v}</option>`).join('')}</select>
+ <label>العنوان</label><input id="tt" value="${esc(t.title)}">
+ <label>وصف قصير</label><input id="ts" value="${esc(t.subtitle||'')}">
+ <div class="two"><div><label>لون الخلفية</label><input id="tb" type="color" value="${esc(t.bg)}" style="height:46px;padding:4px"></div>
+ <div><label>الترتيب (الأصغر أولاً)</label><input id="to" type="number" step="1" value="${t.sort_order}"></div></div>
+ <label>عند الضغط يفتح</label><select id="tl">
+  <option value="offers" ${t.link_type==='offers'?'selected':''}>منطقة العروض</option>
+  <option value="category" ${t.link_type==='category'?'selected':''}>قسم رئيسي</option>
+  <option value="none" ${t.link_type==='none'?'selected':''}>بدون رابط</option></select>
+ <label>القسم (إذا اخترت قسماً)</label><select id="tc"><option value="">—</option>${catOpts}</select>
+ <label style="display:flex;gap:8px;align-items:center;margin-top:12px"><input id="ta" type="checkbox" style="width:auto" ${t.is_active?'checked':''}> ظاهر للعملاء</label>
+ <div class="two" style="margin-top:16px"><button class="btn" id="tsv" onclick="tileSave(${id||0})">حفظ</button>${id?`<button class="btn sec" style="color:var(--red)" onclick="tileDel(${id})">حذف</button>`:''}</div>`);
+ $('tf').onchange=tileImgPick;
+ $('trm').onclick=()=>{imgTile=null;$('tprev').innerHTML='<span>🖼️</span>';$('trm').hidden=true}}
+async function tileImgPick(e){
+ const file=e.target.files[0];if(!file)return;
+ if(!/^image\//.test(file.type))return toast('اختر ملف صورة');
+ $('tmsg').textContent='جاري الرفع...';$('tsv').disabled=true;
+ try{
+  const blob=await shrink(file,900),path='h'+Date.now()+'-'+Math.random().toString(36).slice(2,7)+'.jpg';
+  const up=await sb.storage.from('products').upload(path,blob,{contentType:'image/jpeg',cacheControl:'31536000'});
+  if(up.error)throw up.error;
+  imgTile=sb.storage.from('products').getPublicUrl(path).data.publicUrl;
+  $('tprev').innerHTML='<img src="'+esc(imgTile)+'" alt="">';$('trm').hidden=false;$('tmsg').textContent='تم رفع الصورة. اضغط حفظ لتثبيتها.';
+ }catch(err){$('tmsg').textContent='تعذر رفع الصورة: '+(err.message||'')}
+ $('tsv').disabled=false;e.target.value=''}
+async function tileSave(id){
+ const kind=$('tk').value,lt=$('tl').value;
+ const o={kind,title:$('tt').value.trim(),subtitle:$('ts').value.trim()||null,bg:$('tb')?$('tb').value:'#FFE08A',image_url:imgTile,
+  link_type:lt,link_id:lt==='category'&&$('tc').value?+$('tc').value:null,sort_order:parseInt($('to').value)||0,is_active:$('ta').checked};
+ if(!o.title)return toast('اكتب عنوان البلوك');
+ const r=id?await sb.from('home_tiles').update(o).eq('id',id):await sb.from('home_tiles').insert(o);
+ if(r.error)return toast('تعذر الحفظ: '+r.error.message);
+ closeM();toast('تم الحفظ');vHome()}
+async function tileDel(id){
+ if(!confirm('حذف هذا البلوك نهائياً؟'))return;
+ const r=await sb.from('home_tiles').delete().eq('id',id);
+ if(r.error)return toast('تعذر الحذف');
+ closeM();toast('تم الحذف');vHome()}
+
+/* ---------- المستودعات ---------- */
+let whs=[];
+async function vStores(){
+ $('main').innerHTML='<div class="empty">جاري التحميل...</div>';
+ const r=await sb.from('stores').select('*').order('name');
+ if(r.error)return toast('تعذر تحميل المستودعات');
+ whs=r.data||[];
+ $('main').innerHTML=`<div class="tools"><button class="btn" onclick="whForm()">+ مستودع جديد</button></div>
+ <div class="card"><p class="u" style="margin-bottom:6px">يرى العميل المستودعات على خريطته، ويُطلب من أقرب مستودع يغطي موقعه. المستودع الجديد يبدأ بنفس المنتجات والكميات من المستودع الرئيسي، ثم تعدّل كمياته من تبويب المنتجات.</p>
+ ${whs.length?whs.map(w=>`<div class="row" style="${w.is_active?'':'opacity:.5'}"><div class="e">🏬</div>
+  <div class="t"><b>${esc(w.name)}</b><div class="u">${esc(w.address||'بدون عنوان')} · نطاق ${+w.radius_km} كم${w.is_active?'':' · متوقف'}</div>
+  <div class="u" dir="ltr" style="text-align:start">${(+w.lat).toFixed(5)}, ${(+w.lng).toFixed(5)}</div></div>
+  <button class="btn sec" onclick="whForm('${w.id}')">تعديل</button></div>`).join(''):'<div class="empty">لا توجد مستودعات.</div>'}</div>`}
+function whForm(id){
+ const w=whs.find(x=>x.id===id)||{name:'',address:'',lat:30.03,lng:31.47,radius_km:10,is_active:true};
+ modal(`<h2 style="margin-bottom:6px">${id?'تعديل مستودع':'مستودع جديد'}</h2>
+ <label>الاسم</label><input id="wn" value="${esc(w.name)}" placeholder="مثال: مستودع المعادي">
+ <label>العنوان (للعرض)</label><input id="wa" value="${esc(w.address||'')}">
+ <div class="two"><div><label>خط العرض (lat)</label><input id="wlat" type="number" step="0.00001" dir="ltr" value="${w.lat}"></div>
+ <div><label>خط الطول (lng)</label><input id="wlng" type="number" step="0.00001" dir="ltr" value="${w.lng}"></div></div>
+ <button class="btn sec" type="button" style="margin-top:8px" onclick="whHere()">📍 استخدام موقعي الحالي</button>
+ <label>نطاق التوصيل (كم)</label><input id="wr" type="number" step="0.5" min="0.5" value="${w.radius_km}">
+ <label style="display:flex;gap:8px;align-items:center;margin-top:12px"><input id="wact" type="checkbox" style="width:auto" ${w.is_active?'checked':''}> مفعّل ويظهر للعملاء</label>
+ <div class="two" style="margin-top:16px"><button class="btn" id="wsv" onclick="whSave(${id?`'${id}'`:'null'})">حفظ</button><button class="btn sec" onclick="closeM()">إلغاء</button></div>`)}
+function whHere(){
+ if(!navigator.geolocation)return toast('المتصفح لا يدعم تحديد الموقع');
+ navigator.geolocation.getCurrentPosition(p=>{$('wlat').value=p.coords.latitude.toFixed(5);$('wlng').value=p.coords.longitude.toFixed(5)},
+  ()=>toast('تعذر تحديد الموقع. اكتب الإحداثيات يدوياً'),{enableHighAccuracy:true,timeout:10000})}
+async function whSave(id){
+ const o={p_id:id,p_name:$('wn').value.trim(),p_address:$('wa').value.trim(),p_lat:parseFloat($('wlat').value),p_lng:parseFloat($('wlng').value),p_radius:parseFloat($('wr').value),p_active:$('wact').checked};
+ if(!o.p_name)return toast('اكتب اسم المستودع');
+ if(isNaN(o.p_lat)||isNaN(o.p_lng))return toast('أدخل الإحداثيات');
+ if(!(o.p_radius>0))return toast('أدخل نطاق التوصيل');
+ $('wsv').disabled=true;
+ const r=await sb.rpc('admin_upsert_store',o);
+ $('wsv').disabled=false;
+ if(r.error)return toast('تعذر الحفظ: '+r.error.message);
+ closeM();toast('تم الحفظ');vStores()}
+
+/* ---------- بيانات المندوب (الصورة والمركبة) ---------- */
+let imgCour=null;
+async function courierForm(id){
+ const u=team.find(x=>x.id===id)||{};
+ const r=await sb.from('profiles').select('avatar_url,vehicle_type,vehicle_plate').eq('id',id).maybeSingle();
+ const c=r.data||{};imgCour=c.avatar_url||null;
+ modal(`<h2 style="margin-bottom:6px">مركبة المندوب</h2><p class="u" style="margin-bottom:10px">${esc(u.full_name||'')}</p>
+ <div class="imgbox"><div id="cpprev">${c.avatar_url?`<img src="${esc(c.avatar_url)}" alt="">`:'<span>👤</span>'}</div>
+  <div><label for="cpf" class="btn sec" style="display:inline-block;cursor:pointer">صورة المندوب</label><input id="cpf" type="file" accept="image/*" hidden><div class="u" id="cpmsg">تظهر للعميل أثناء التوصيل، خلفية بيضاء.</div></div></div>
+ <label>نوع المركبة</label><select id="cvt"><option value="">— اختر —</option>${Object.entries({car:'سيارة',motorcycle:'دراجة نارية',tuktuk:'توكتوك'}).map(([k,v])=>`<option value="${k}" ${c.vehicle_type===k?'selected':''}>${v}</option>`).join('')}</select>
+ <label>رقم المركبة (حروف وأرقام)</label><input id="cpl" dir="ltr" value="${esc(c.vehicle_plate||'')}">
+ <div class="two" style="margin-top:16px"><button class="btn" id="cpsv" onclick="courierSave('${id}')">حفظ</button><button class="btn sec" onclick="closeM()">إلغاء</button></div>`);
+ $('cpf').onchange=courierImgPick}
+async function courierImgPick(e){
+ const file=e.target.files[0];if(!file)return;
+ if(!/^image\//.test(file.type))return toast('اختر ملف صورة');
+ $('cpmsg').textContent='جاري الرفع...';$('cpsv').disabled=true;
+ try{
+  const blob=await shrink(file,600),path='cr'+Date.now()+'-'+Math.random().toString(36).slice(2,7)+'.jpg';
+  const up=await sb.storage.from('products').upload(path,blob,{contentType:'image/jpeg',cacheControl:'31536000'});
+  if(up.error)throw up.error;
+  imgCour=sb.storage.from('products').getPublicUrl(path).data.publicUrl;
+  $('cpprev').innerHTML='<img src="'+esc(imgCour)+'" alt="">';$('cpmsg').textContent='تم رفع الصورة. اضغط حفظ لتثبيتها.';
+ }catch(err){$('cpmsg').textContent='تعذر رفع الصورة: '+(err.message||'')}
+ $('cpsv').disabled=false;e.target.value=''}
+async function courierSave(id){
+ const plate=$('cpl').value.trim().toUpperCase();
+ if(plate&&!/^[A-Z0-9؀-ۿ ]{2,12}$/.test(plate))return toast('رقم المركبة: حروف وأرقام فقط');
+ $('cpsv').disabled=true;
+ const r=await sb.rpc('admin_set_courier_info',{p_id:id,p_avatar:imgCour,p_vehicle_type:$('cvt').value||null,p_plate:plate||null});
+ $('cpsv').disabled=false;
+ if(r.error)return toast('تعذر الحفظ: '+r.error.message);
+ closeM();toast('تم الحفظ')}
+
+/* ---------- طلبات المناديب ---------- */
+let courApps=[];
+const VT2={car:'سيارة',motorcycle:'دراجة نارية',tuktuk:'توكتوك'};
+const APP_STATUS={pending:'قيد المراجعة',approved:'مقبول',rejected:'مرفوض'};
+async function vCapps(){
+ $('main').innerHTML='<div class="empty">جاري التحميل...</div>';
+ const r=await sb.from('courier_applications').select('*').order('created_at',{ascending:false}).limit(200);
+ if(r.error)return toast('تعذر تحميل الطلبات');
+ courApps=r.data||[];
+ const pend=courApps.filter(a=>a.status==='pending').length;
+ $('main').innerHTML=`<div class="card"><b>طلبات تسجيل المناديب</b><p class="u" style="margin:4px 0 6px">${pend} طلب بانتظار المراجعة</p>
+ ${courApps.length?courApps.map(a=>`<div class="row"><div class="e">${a.status==='pending'?'🕒':a.status==='approved'?'✅':'❌'}</div>
+  <div class="t"><b>${esc(a.full_name)}</b><div class="u" dir="ltr" style="text-align:start">${esc(a.phone)} · ${esc(a.email)}</div><div class="u">${VT2[a.vehicle_type]||''} · ${esc(a.vehicle_plate)} · ${APP_STATUS[a.status]}</div></div>
+  <button class="btn sec" onclick="appView(${a.id})">مراجعة</button></div>`).join(''):'<div class="empty">لا توجد طلبات بعد</div>'}</div>`}
+async function appView(id){
+ const a=courApps.find(x=>x.id===id);if(!a)return;
+ const sign=async p=>{const r=await sb.storage.from('courier-docs').createSignedUrl(p,900);return r.data?r.data.signedUrl:''};
+ const [u1,u2,u3]=await Promise.all([sign(a.id_card_path),sign(a.license_path),sign(a.photo_path)]);
+ const img=(u,t)=>`<div style="flex:1;min-width:0"><small class="u">${t}</small><a href="${u}" target="_blank" rel="noopener"><img src="${u}" alt="${t}" style="width:100%;border-radius:10px;background:#fff;margin-top:4px"></a></div>`;
+ modal(`<h2 style="margin-bottom:4px">${esc(a.full_name)}</h2>
+ <p class="u" dir="ltr" style="text-align:start">${esc(a.phone)} · ${esc(a.email)}</p>
+ <p class="u">الرقم القومي: <b dir="ltr">${esc(a.national_id)}</b></p>
+ <p class="u">${VT2[a.vehicle_type]||''} · رقم المركبة: <b>${esc(a.vehicle_plate)}</b></p>
+ <div style="display:flex;gap:8px;margin:12px 0">${img(u1,'البطاقة')}${img(u2,'الرخصة')}${img(u3,'الصورة')}</div>
+ ${a.status==='pending'?`<div class="two"><button class="btn" id="apok" onclick="appApprove(${a.id})">موافقة وإنشاء الحساب</button><button class="btn sec" style="color:var(--red)" onclick="appReject(${a.id})">رفض</button></div>`
+   :`<p><span class="pill ${a.status==='approved'?'':'off'}">${APP_STATUS[a.status]}</span>${a.reject_reason?' · '+esc(a.reject_reason):''}</p>`}`)}
+function appPw(){const c='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789',r=new Uint8Array(10);crypto.getRandomValues(r);return Array.from(r,b=>c[b%c.length]).join('')}
+async function appApprove(id){
+ const a=courApps.find(x=>x.id===id);if(!a)return;
+ $('apok').disabled=true;
+ try{
+  const pw=appPw();
+  const s=await sb.functions.invoke('phone-signup',{body:{phone:a.phone,password:pw,full_name:a.full_name}});
+  if(s.error){let j=null;try{j=await s.error.context.json()}catch(e){}
+   throw new Error(j&&j.error==='exists'?'هذا الرقم لديه حساب بالفعل':'تعذر إنشاء الحساب')}
+  const email=a.phone+'@phone.salla-sareea.app';
+  const u=await sb.rpc('admin_users');if(u.error)throw u.error;
+  const user=(u.data||[]).find(x=>x.email===email);if(!user)throw new Error('الحساب غير موجود بعد، أعد المحاولة');
+  const role=await sb.rpc('admin_set_role',{p_user:user.id,p_role:'courier',p_store:null});if(role.error)throw role.error;
+  // نسخ صورة المندوب إلى التخزين العام لتظهر للعميل
+  const dl=await sb.storage.from('courier-docs').download(a.photo_path);if(dl.error)throw dl.error;
+  const path='cr'+Date.now()+'-'+Math.random().toString(36).slice(2,7)+'.jpg';
+  const up=await sb.storage.from('products').upload(path,dl.data,{contentType:'image/jpeg',cacheControl:'31536000'});if(up.error)throw up.error;
+  const avatar=sb.storage.from('products').getPublicUrl(path).data.publicUrl;
+  const info=await sb.rpc('admin_set_courier_info',{p_id:user.id,p_avatar:avatar,p_vehicle_type:a.vehicle_type,p_plate:a.vehicle_plate});if(info.error)throw info.error;
+  const st=await sb.from('courier_applications').update({status:'approved',reviewed_at:new Date().toISOString()}).eq('id',id);if(st.error)throw st.error;
+  const link=location.origin+'/courier/';
+  const txt=`مرحباً ${a.full_name}، تم قبول طلبك كمندوب في جبلاوى.\nرابط التطبيق: ${link}\nرقم الجوال: ${a.phone}\nكلمة المرور: ${pw}`;
+  modal(`<h2 style="margin-bottom:6px">تم إنشاء حساب المندوب ✅</h2>
+   <p class="u" style="margin-bottom:8px">أرسل هذه البيانات للمندوب. كلمة المرور لا تُعرض مرة أخرى.</p>
+   <textarea readonly id="cred" style="width:100%;min-height:130px;direction:rtl" dir="rtl">${esc(txt)}</textarea>
+   <div class="two" style="margin-top:12px"><button class="btn" onclick="navigator.clipboard.writeText($('cred').value).then(()=>toast('تم النسخ'),()=>{$('cred').select();toast('انسخ النص يدوياً')})">نسخ البيانات</button><button class="btn sec" onclick="closeM();vCapps()">تم</button></div>`);
+ }catch(e){toast('تعذر الاعتماد: '+(e.message||''));$('apok')&&($('apok').disabled=false)}}
+async function appReject(id){
+ const reason=prompt('سبب الرفض (يظهر للإدارة فقط)','');if(reason===null)return;
+ const r=await sb.from('courier_applications').update({status:'rejected',reject_reason:reason.trim()||null,reviewed_at:new Date().toISOString()}).eq('id',id);
+ if(r.error)return toast('تعذر تسجيل الرفض');
+ closeM();toast('تم الرفض');vCapps()}
+
+/* ---------- إعادة تعيين كلمة مرور المندوب ---------- */
+async function courierResetPw(userId,name,phone){
+ if(!confirm('سيتم إنشاء كلمة مرور جديدة وإلغاء القديمة. متابعة؟'))return;
+ const pw=appPw();
+ const r=await sb.rpc('admin_reset_courier_password',{p_user:userId,p_password:pw});
+ if(r.error)return toast('تعذر التغيير: '+r.error.message);
+ const link=location.origin+'/courier/';
+ const txt=`مرحباً ${name}، هذه بيانات الدخول الجديدة لتطبيق المندوب في جبلاوى.\nرابط التطبيق: ${link}\nرقم الجوال: ${phone}\nكلمة المرور: ${pw}`;
+ modal(`<h2 style="margin-bottom:6px">تم تغيير كلمة المرور ✅</h2>
+   <p class="u" style="margin-bottom:8px">أرسل البيانات الجديدة للمندوب. كلمة المرور لا تُعرض مرة أخرى.</p>
+   <textarea readonly id="cred" style="width:100%;min-height:130px" dir="rtl">${esc(txt)}</textarea>
+   <div class="two" style="margin-top:12px"><button class="btn" onclick="navigator.clipboard.writeText($('cred').value).then(()=>toast('تم النسخ'),()=>{$('cred').select();toast('انسخ النص يدوياً')})">نسخ البيانات</button><button class="btn sec" onclick="closeM()">تم</button></div>`)}
+
+if(SB_URL.startsWith('YOUR_')){$('login').classList.remove('hide');$('login').innerHTML='<div class="empty"><div style="font-size:48px">⚙️</div><b>الإعداد مطلوب</b><p style="margin-top:8px">ضع SB_URL و SB_KEY في أعلى كود الصفحة.</p></div>'}
+else{window.__sbReady.then(function(){sb=supabase.createClient(SB_URL,SB_KEY);boot()}).catch(function(){document.body.insertAdjacentHTML('beforeend','<div style="position:fixed;left:0;right:0;bottom:0;background:#b00020;color:#fff;padding:12px 14px;font:600 14px/1.6 Tahoma,sans-serif;z-index:99999;direction:rtl;text-align:right">تعذر تحميل مكتبة الاتصال. تحقق من الإنترنت، أو افتح الرابط في Chrome أو Safari ثم أعد المحاولة.</div>')})}
+</script>
+<script>if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{})</script></body>
+</html>
