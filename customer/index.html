@@ -65,7 +65,7 @@ h2{font-size:18px;padding:16px 16px 8px}
 .empty{text-align:center;color:var(--mut);padding:40px 16px}
 #toast{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--red);color:#fff;padding:10px 18px;border-radius:99px;font-size:14px;z-index:9;max-width:92%;text-align:center}
 </style>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0B5D44"><link rel="icon" type="image/png" href="favicon.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="../theme.css"><script src="../call.js" defer></script></head>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0B5D44"><link rel="icon" type="image/png" href="favicon.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="../theme.css"><script src="../call.js" defer></script><style>.sup-ico{margin-inline-start:auto;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;color:#111;text-decoration:none;flex-shrink:0}.sup-ico svg{display:block}</style></head>
 <body data-app="customer">
 
 <section id="auth" class="hide page" style="padding-top:18px">
@@ -100,7 +100,7 @@ h2{font-size:18px;padding:16px 16px 8px}
 </section>
 
 <section id="track" class="hide">
-  <div class="top"><button onclick="go('orders')" aria-label="رجوع">→</button><h2 style="padding:0" id="trT">تتبع الطلب</h2></div>
+  <div class="top"><button onclick="go('orders')" aria-label="رجوع">→</button><h2 style="padding:0" id="trT">تتبع الطلب</h2><a id="trSup" class="sup-ico" target="_blank" rel="noopener" aria-label="الدعم الفني" style="display:none"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/><path d="M19 20a4 4 0 0 1-4 2h-2"/></svg></a></div>
   <div id="trMapBox" class="hide"><div id="trmap"></div><div id="trEta" class="treta"></div><button class="recenter" onclick="recenterTrack()" aria-label="إعادة التمركز">🎯</button></div>
   <div class="page" id="trBody"></div>
 </section>
@@ -359,7 +359,7 @@ async function watch(){
 function km(a,b,c,d){const R=6371,t=x=>x*Math.PI/180,h=Math.sin(t(c-a)/2)**2+Math.cos(t(a))*Math.cos(t(c))*Math.sin(t(d-b)/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
 function render(){render0();trackMap()}
 function render0(){
- const o=order;if(o.courier_id&&!(o.id in CC))loadCC(o);if(o.status==='delivered'&&o.courier_id&&RT[o.id]===undefined)loadRT(o);if(o.courier_id)chatInit(o.id);if(o.courier_id&&window.JCall)JCall.attach(sb,o.id);$('trT').textContent='طلب #'+o.id;
+ const o=order;if(o.courier_id&&!(o.id in CC))loadCC(o);if(o.status==='delivered'&&o.courier_id&&RT[o.id]===undefined)loadRT(o);if(o.courier_id)chatInit(o.id);if(o.courier_id&&window.JCall)JCall.attach(sb,o.id);$('trT').textContent='طلب #'+o.id;{const sup=$('trSup');if(sup){sup.href=SUPPORT_WA?'https://wa.me/'+SUPPORT_WA+'?text='+encodeURIComponent('مرحباً، أحتاج مساعدة في الطلب #'+o.id):'#';sup.style.display=SUPPORT_WA?'':'none'}}
  if(o.status==='awaiting_payment'){$('trBody').innerHTML=`<div class="empty"><div style="font-size:48px">💳</div><b>بانتظار إتمام الدفع</b><p style="margin-top:8px">أكمل الدفع ليبدأ المستودع بتجهيز طلبك. يُلغى الطلب تلقائيًا بعد 30 دقيقة دون دفع.</p></div><button class="cta" onclick="startPay(${o.id})">ادفع ${fmt(o.total)} الآن</button>`;return}
  const i=IDX[o.status];
  const dist=courier&&courier.lat&&o.address_lat?km(courier.lat,courier.lng,o.address_lat,o.address_lng):null;
@@ -368,7 +368,6 @@ function render0(){
  ${courierHtml(o)}
  ${rateHtml(o)}
  ${dist!==null?`<p class="u">المندوب يبعد عنك حوالي ${dist<1?Math.round(dist*1000)+' م':dist.toFixed(1)+' كم'}</p>`:''}
- ${supportHtml()}
  ${o.courier_id?`<button class="cta chatb" onclick="openChat()">💬 راسل المندوب <span class="chat-dot ${CH.unread?'':'hide'}">${CH.unread}</span></button>`:''}
  <ul class="tl">${ST.map((x,k)=>`<li class="${k<i||o.status==='delivered'?'done':k===i?'on':''}"><i>${k<i||o.status==='delivered'?'✓':''}</i>${x}</li>`).join('')}</ul>
  <div class="sum">${o.order_items.map(x=>`<p><span>${esc(x.name)}</span><span>×${x.qty}</span></p>`).join('')}
