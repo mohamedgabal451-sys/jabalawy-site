@@ -124,18 +124,24 @@ function orderAlert(){
  try{
   unlockAudio();if(AC){
    const t0=AC.currentTime;
-   for(let i=0;i<5;i++){
-    const o=AC.createOscillator(),g=AC.createGain();o.type='square';o.frequency.value=1200;
-    const t=t0+i*0.16;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.25,t+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+0.1);
-    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+0.12)}}
+   // siren-like urgent alert: alternating high/low square tones, twice per ring
+   for(let r=0;r<2;r++){
+    for(let i=0;i<6;i++){
+     const f=i%2?1480:960, t=t0+r*0.9+i*0.13;
+     const o=AC.createOscillator(),g=AC.createGain(),lp=AC.createBiquadFilter();
+     o.type='square';o.frequency.value=f;lp.type='lowpass';lp.frequency.value=2600;
+     g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.85,t+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+0.13);
+     o.connect(lp);lp.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+0.15);
+     const o2=AC.createOscillator(),g2=AC.createGain();o2.type='sawtooth';o2.frequency.value=f*2;g2.gain.setValueAtTime(0.0001,t);g2.gain.exponentialRampToValueAtTime(0.25,t+0.01);g2.gain.exponentialRampToValueAtTime(0.0001,t+0.1);o2.connect(g2);g2.connect(AC.destination);o2.start(t);o2.stop(t+0.12)}}
+  }
  }catch(e){}
- try{if(navigator.vibrate)navigator.vibrate([300,150,300,150,300])}catch(e){}
+ try{if(navigator.vibrate)navigator.vibrate([500,120,500,120,500,120,700])}catch(e){}
 }
 /* ---------- المنبّه المتكرر حتى يقبل المندوب الطلب أو يرفضه ---------- */
 let DISMISSED=new Set();
 try{DISMISSED=new Set(JSON.parse(localStorage.getItem('jb_dismissed')||'[]'))}catch(e){}
 let ALARM_T=null;
-function alarmStart(){if(ALARM_T)return;orderAlert();ALARM_T=setInterval(orderAlert,2500)}
+function alarmStart(){if(ALARM_T)return;orderAlert();ALARM_T=setInterval(orderAlert,2200)}
 function alarmStop(){if(ALARM_T){clearInterval(ALARM_T);ALARM_T=null}}
 function refreshAlarm(){offers.length?alarmStart():alarmStop()}
 function rejectOffer(id){
