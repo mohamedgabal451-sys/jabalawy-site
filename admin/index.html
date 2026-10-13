@@ -408,10 +408,26 @@ async function vTeam(){
 function drawTeam(){
  const q=f.tq.trim().toLowerCase(),L=team.filter(u=>(u.email||'').toLowerCase().includes(q)||(u.full_name||'').toLowerCase().includes(q));
  const ord={admin:0,staff:1,courier:2,customer:3};L.sort((a,b)=>ord[a.role]-ord[b.role]);
- $('main').innerHTML=`<div class="tools"><input id="tq" placeholder="ابحث بالبريد أو الاسم" value="${esc(f.tq)}" aria-label="بحث"></div>
+ $('main').innerHTML=`<div class="tools"><button class="btn" onclick="whForm()">+ حساب مستودع جديد</button></div><div class="tools"><input id="tq" placeholder="ابحث بالبريد أو الاسم" value="${esc(f.tq)}" aria-label="بحث"></div>
  <div class="card">${L.length?L.map(u=>`<div class="row"><div class="t"><b>${esc(u.full_name||'بدون اسم')}</b><div class="u" dir="ltr" style="text-align:right">${esc(shown(u.email))}</div></div>
  <span class="pill ${u.role==='customer'?'off':''}">${ROLE[u.role]}</span>${u.role==='courier'?`<button class="btn sec" onclick="courierForm('${u.id}')">المركبة</button><button class="btn sec" onclick="courierResetPw('${u.id}','${esc(u.full_name||'')}','${esc((u.email||'').split('@')[0])}')">كلمة مرور جديدة</button>`:''}<button class="btn sec" onclick="roleForm('${u.id}')">تغيير</button></div>`).join(''):'<div class="empty">لا يوجد مستخدمون</div>'}</div>`;
  $('tq').oninput=e=>{f.tq=e.target.value;const p=e.target.selectionStart;drawTeam();$('tq').focus();$('tq').setSelectionRange(p,p)}}
+function whForm(){
+ modal(`<h2 style="margin-bottom:4px">حساب مستودع جديد</h2>
+ <p class="u">يدخل الموظف بالاسم والباسورد الذي تحدده، ويفتح المستودع المرتبط بحسابه مباشرة.</p>
+ <label>اسم الموظف</label><input id="wn" placeholder="مثال: أحمد - المنصورة">
+ <label>اسم المستخدم (إنجليزي بدون مسافات)</label><input id="wu" dir="ltr" placeholder="mansoura" autocomplete="off">
+ <label>كلمة المرور (8 أحرف على الأقل)</label><input id="wp" dir="ltr" type="text" autocomplete="new-password">
+ <label>المستودع</label><select id="ws">${stores.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select>
+ <div class="two" style="margin-top:16px"><button class="btn" id="wsv" onclick="whSave()">إنشاء الحساب</button><button class="btn sec" onclick="closeM()">إلغاء</button></div>`)}
+async function whSave(){
+ const u=$('wu').value.trim(),pw=$('wp').value,st=$('ws').value,nm=$('wn').value.trim();
+ if(!/^[a-z0-9_]{3,30}$/i.test(u))return toast('اسم المستخدم بالإنجليزية والأرقام فقط (3 إلى 30 حرفًا)');
+ if(pw.length<8)return toast('كلمة المرور 8 أحرف على الأقل');
+ $('wsv').disabled=true;
+ const r=await sb.rpc('admin_create_warehouse_account',{p_username:u,p_password:pw,p_store:st,p_name:nm||null});
+ if(r.error){$('wsv').disabled=false;return toast(r.error.message)}
+ closeM();toast('تم إنشاء حساب المستودع: '+u);vTeam()}
 function roleForm(id){
  const u=team.find(x=>x.id===id);
  modal(`<h2 style="margin-bottom:4px">${esc(u.full_name||shown(u.email))}</h2><p class="u" dir="ltr" style="text-align:right">${esc(shown(u.email))}</p>
