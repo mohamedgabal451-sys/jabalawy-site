@@ -9,7 +9,18 @@ function show(t,btns){const d=ov();d.classList.remove('hide');$('jcT').textConte
  (btns||[]).forEach(([label,cls,fn])=>{const x=document.createElement('button');x.className='btn '+cls;x.textContent=label;x.onclick=fn;b.appendChild(x)})}
 function hide(){const d=$('jcOv');if(d)d.classList.add('hide')}
 function send(type,extra){if(ch)ch.send({type:'broadcast',event:'signal',payload:Object.assign({type:type},extra||{})})}
-function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator();o.frequency.value=880;o.connect(c.destination);o.start();setTimeout(()=>{o.stop();c.close()},500)}catch(e){}}
+let ringT=null,ringAC=null;
+function ringCtx(){try{ringAC=ringAC||new(window.AudioContext||window.webkitAudioContext)();if(ringAC.state==='suspended')ringAC.resume();return ringAC}catch(e){return null}}
+function glass(c,f,t,dur,v){
+ const g=c.createGain();g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v,t+0.003);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);g.connect(c.destination);
+ const o=c.createOscillator();o.type='sine';o.frequency.value=f;o.connect(g);o.start(t);o.stop(t+dur+0.05);
+ const h=c.createGain();h.gain.setValueAtTime(0.0001,t);h.gain.exponentialRampToValueAtTime(v*0.25,t+0.003);h.gain.exponentialRampToValueAtTime(0.0001,t+Math.min(dur,0.2));h.connect(c.destination);
+ const o2=c.createOscillator();o2.type='sine';o2.frequency.value=f*2;o2.connect(h);o2.start(t);o2.stop(t+0.25)}
+function beep(){const c=ringCtx();if(!c)return;const t=c.currentTime;glass(c,1567.98,t,0.35,0.5);glass(c,2093,t+0.09,0.5,0.4)}
+function vib(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+function ringIncoming(){stopRing();const pat=()=>{const c=ringCtx();if(c){const t=c.currentTime;[1046.5,1318.5,1567.98,2093].forEach((f,i)=>glass(c,f,t+i*0.12,0.5,0.3));glass(c,2093,t+0.6,0.8,0.18);const u=t+2.6;[1046.5,1318.5,1567.98,2093].forEach((f,i)=>glass(c,f,u+i*0.12,0.5,0.3));glass(c,2093,u+0.6,0.8,0.18)}vib([400,200,400])};pat();ringT=setInterval(pat,5400)}
+function ringOutgoing(){stopRing();const pat=()=>{const c=ringCtx();if(c){const t=c.currentTime;glass(c,1318.5,t,0.7,0.16);glass(c,1567.98,t+0.35,0.7,0.12)}};pat();ringT=setInterval(pat,3200)}
+function stopRing(){if(ringT){clearInterval(ringT);ringT=null}try{navigator.vibrate&&navigator.vibrate(0)}catch(e){}}
 function media(){return navigator.mediaDevices.getUserMedia({audio:true,video:false})}
 function makePc(){
  pc=new RTCPeerConnection(ICE);
@@ -23,7 +34,7 @@ function makePc(){
  };
 }
 async function flush(){const list=pending;pending=[];for(const c of list){try{await pc.addIceCandidate(c)}catch(e){}}}
-function cleanup(msg){
+function cleanup(msg){stopRing();
  clearTimeout(timer);
  if(pc){try{pc.close()}catch(e){}}
  if(ls){ls.getTracks().forEach(t=>t.stop())}
@@ -36,12 +47,12 @@ async function onSig(m){
  switch(p.type){
   case 'ring':
    if(st!=='idle'){send('decline',{busy:1});return}
-   st='ringing';beep();
+   st='ringing';ringIncoming();
    show('مكالمة واردة',[['ردّ','ok',accept],['رفض','bad',decline]]);
    timer=setTimeout(()=>{if(st==='ringing'){send('decline');cleanup('')}},30000);
    break;
   case 'accept':
-   if(st==='calling'&&pc){clearTimeout(timer);st='connected';
+   if(st==='calling'&&pc){clearTimeout(timer);stopRing();st='connected';
     const o=await pc.createOffer();await pc.setLocalDescription(o);send('offer',{sdp:o});
     show('جارٍ الاتصال...',[['إنهاء','bad',hangup]]);}
    break;
@@ -70,12 +81,12 @@ async function start(){
  const ok=await Promise.race([readyP,new Promise(r=>setTimeout(()=>r(false),6000))]);
  if(!ok){alert('تعذّر الاتصال بقناة المكالمة، أعد تحميل الصفحة وحاول مرة أخرى');return}
  try{ls=await media()}catch(e){alert('يرجى السماح باستخدام الميكروفون من إعدادات المتصفح');return}
- st='calling';makePc();send('ring');
+ st='calling';makePc();send('ring');ringOutgoing();
  show('جارٍ الاتصال...',[['إلغاء','bad',hangup]]);
  timer=setTimeout(()=>{if(st==='calling'){send('hangup');cleanup('لم يتم الرد')}},30000);
 }
 async function accept(){
- clearTimeout(timer);
+ clearTimeout(timer);stopRing();
  try{ls=await media()}catch(e){decline();alert('يرجى السماح باستخدام الميكروفون');return}
  st='connected';makePc();send('accept');
  show('جارٍ الاتصال...',[['إنهاء','bad',hangup]]);
