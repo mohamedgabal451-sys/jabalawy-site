@@ -37,6 +37,11 @@ header h1{font-size:19px}header button{color:#b9d3c8;font-size:14px}
 .ord li label{display:flex;gap:10px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line);cursor:pointer}
 .ord li input{width:20px;height:20px;accent-color:var(--ok)}
 .ord li.d{color:var(--mut);text-decoration:line-through}
+.ord li{display:flex;align-items:center;gap:8px}
+.ord li label{flex:1;min-width:0}
+.ord li.na-line label{color:var(--mut);text-decoration:line-through}
+.ord li.na-line small{color:var(--red);text-decoration:none;font-weight:700;font-size:12px}
+.na-btn{flex:none;font:inherit;font-size:12px;color:var(--red);background:none;border:1px solid var(--red);border-radius:99px;padding:3px 10px;cursor:pointer}
 .cta{width:100%;padding:12px;border-radius:12px;background:var(--acc);color:#12332b;font-weight:800}
 .cta:disabled{opacity:.4;cursor:not-allowed}.cta.ok{background:var(--ok);color:#fff}
 .x{margin-top:6px;width:100%;font-size:13px;color:var(--red);padding:6px}
@@ -130,7 +135,7 @@ async function boot(){
  subscribe();ready=true}
 
 /* ---------- الطلبات ---------- */
-const SEL='*, order_items(id,name,qty)';
+const SEL='*, order_items(id,name,qty,unavailable)';
 async function loadOrders(){
  const r=await sb.from('orders').select(SEL).eq('store_id',STORE).in('status',ACTIVE).order('created_at');
  if(r.error)return toast('تعذر تحميل الطلبات');
@@ -155,9 +160,11 @@ function subscribe(){
 
 function card(o){
  const set=checked[o.id]||(checked[o.id]=new Set());
- const all=o.order_items.every(i=>set.has(i.id));
+ const active=o.order_items.filter(i=>!i.unavailable);
+ const canEdit=['placed','picking','ready'].includes(o.status);
+ const all=active.every(i=>set.has(i.id));
  const age=Math.floor((Date.now()-new Date(o.created_at))/1000);
- const lines=o.order_items.map(i=>`<li class="${set.has(i.id)&&o.status==='picking'?'d':''}"><label>${o.status==='picking'?`<input type="checkbox" ${set.has(i.id)?'checked':''} onchange="chk(${o.id},${i.id})">`:''}<span>${esc(i.name)}</span><b style="margin-inline-start:auto">×${i.qty}</b></label></li>`).join('');
+ const lines=o.order_items.map(i=>i.unavailable?`<li class="na-line"><label><span>${esc(i.name)}</span><small>غير متوفر</small><b style="margin-inline-start:auto">×${i.qty}</b></label></li>`:`<li class="${set.has(i.id)&&o.status==='picking'?'d':''}"><label>${o.status==='picking'?`<input type="checkbox" ${set.has(i.id)?'checked':''} onchange="chk(${o.id},${i.id})">`:''}<span>${esc(i.name)}</span><b style="margin-inline-start:auto">×${i.qty}</b></label>${canEdit&&active.length>1?`<button class="na-btn" onclick="markNA(${i.id},${o.id})">غير متوفر</button>`:''}</li>`).join('');
  const btn=o.status==='placed'?`<button class="cta" onclick="setSt(${o.id},'picking')">ابدأ التجهيز</button>`
   :o.status==='picking'?`<button class="cta" ${all?'':'disabled'} onclick="setSt(${o.id},'ready')">${all?'الطلب جاهز':'علّم كل المنتجات أولاً'}</button>`
   :`<div class="cta ok" style="text-align:center">${o.courier_id?'المندوب: '+esc(couriers[o.courier_id]||'...'):'بانتظار قبول مندوب'}</div>`;
@@ -172,6 +179,10 @@ function kpi(){$('k1').textContent=orders.filter(o=>o.status==='placed').length;
  $('k2').textContent=orders.filter(o=>o.status==='picking').length;
  $('k3').textContent=inv.filter(s=>s.qty<=s.low_threshold).length}
 function chk(oid,iid){const s=checked[oid];s.has(iid)?s.delete(iid):s.add(iid);draw()}
+async function markNA(itemId,orderId){
+ if(!confirm('تحديد هذا الصنف كغير متوفر؟ سيُحدّث إجمالي الطلب، وتُسترد قيمته للمحفظة إن كانت مدفوعة منها.'))return;
+ const r=await sb.rpc('staff_mark_item_unavailable',{p_item:itemId});if(r.error)return toast(r.error.message);
+ if(checked[orderId])checked[orderId].delete(itemId);toast('تم تحديد الصنف كغير متوفر');refresh(orderId)}
 async function setSt(id,st){const r=await sb.rpc('staff_set_status',{p_order:id,p_status:st});if(r.error)return toast(r.error.message);refresh(id)}
 async function cancel(id){if(!confirm('إلغاء الطلب #'+id+'؟ سيرجع المخزون تلقائيًا.'))return;await setSt(id,'cancelled');toast('تم إلغاء الطلب وإرجاع المخزون')}
 
