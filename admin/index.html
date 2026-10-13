@@ -412,13 +412,13 @@ function drawTeam(){
  <div class="card">${L.length?L.map(u=>`<div class="row"><div class="t"><b>${esc(u.full_name||'بدون اسم')}</b><div class="u" dir="ltr" style="text-align:right">${esc(shown(u.email))}</div></div>
  <span class="pill ${u.role==='customer'?'off':''}">${ROLE[u.role]}</span>${u.role==='courier'?`<button class="btn sec" onclick="courierForm('${u.id}')">المركبة</button><button class="btn sec" onclick="courierResetPw('${u.id}','${esc(u.full_name||'')}','${esc((u.email||'').split('@')[0])}')">كلمة مرور جديدة</button>`:''}<button class="btn sec" onclick="roleForm('${u.id}')">تغيير</button></div>`).join(''):'<div class="empty">لا يوجد مستخدمون</div>'}</div>`;
  $('tq').oninput=e=>{f.tq=e.target.value;const p=e.target.selectionStart;drawTeam();$('tq').focus();$('tq').setSelectionRange(p,p)}}
-function whForm(){
+function whForm(preStore){
  modal(`<h2 style="margin-bottom:4px">حساب مستودع جديد</h2>
  <p class="u">يدخل الموظف بالاسم والباسورد الذي تحدده، ويفتح المستودع المرتبط بحسابه مباشرة.</p>
  <label>اسم الموظف</label><input id="wn" placeholder="مثال: أحمد - المنصورة">
  <label>اسم المستخدم (إنجليزي بدون مسافات)</label><input id="wu" dir="ltr" placeholder="mansoura" autocomplete="off">
  <label>كلمة المرور (8 أحرف على الأقل)</label><div style="display:flex;gap:8px"><input id="wp" dir="ltr" type="text" autocomplete="new-password" style="flex:1"><button type="button" class="btn sec" style="width:auto;padding:0 12px" onclick="whGen()">توليد</button></div>
- <label>المستودع</label><select id="ws">${stores.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select>
+ <label>المستودع</label><select id="ws">${stores.map(s=>`<option value="${s.id}" ${preStore===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select>
  <div class="two" style="margin-top:16px"><button class="btn" id="wsv" onclick="whSave()">إنشاء الحساب</button><button class="btn sec" onclick="closeM()">إلغاء</button></div>`)}
 function whGen(){const a='ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';const r=new Uint8Array(12);crypto.getRandomValues(r);$('wp').value=Array.from(r,b=>a[b%a.length]).join('')}
 async function whSave(){
@@ -444,7 +444,7 @@ async function roleSave(id){
 /* ---------- الإعدادات ---------- */
 function vSet(){
  $('main').innerHTML=`<div class="card"><b>المستودعات</b>${stores.map(s=>`<div class="row"><div class="t"><b>${esc(s.name)}</b><div class="u">نطاق التوصيل ${+s.radius_km} كم</div></div>
-  <span class="pill ${s.is_open?'':'off'}">${s.is_open?'مفتوح':'مغلق'}</span><button class="btn sec" onclick="sToggle('${s.id}')">${s.is_open?'إغلاق':'فتح'}</button><button class="btn sec" onclick="sForm('${s.id}')">تعديل</button></div>`).join('')}</div>
+  <span class="pill ${s.is_open?'':'off'}">${s.is_open?'مفتوح':'مغلق'}</span><button class="btn sec" onclick="sToggle('${s.id}')">${s.is_open?'إغلاق':'فتح'}</button><button class="btn sec" onclick="sForm('${s.id}')">تعديل</button><button class="btn sec" onclick="whForm('${s.id}')">حساب الدخول</button></div>`).join('')}</div>
  <div class="card"><b>الأقسام</b>${cats.map(c=>`<div class="row" style="padding-inline-start:${c.parent_id?26:0}px"><div class="e">${esc(c.emoji||'🗂️')}</div><div class="t">${c.parent_id?'↳ ':''}${esc(c.name)} <span class="u">${c.parent_id?'فرعي · ':'رئيسي · '}ترتيب ${c.sort_order}</span></div><button class="btn sec" onclick="cForm(${c.id})">تعديل</button></div>`).join('')}
  <button class="btn" style="margin-top:12px" onclick="cForm()">+ قسم جديد</button></div>`}
 async function sToggle(id){const s=stores.find(x=>x.id===id);
