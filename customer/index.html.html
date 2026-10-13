@@ -65,7 +65,7 @@ h2{font-size:18px;padding:16px 16px 8px}
 .empty{text-align:center;color:var(--mut);padding:40px 16px}
 #toast{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--red);color:#fff;padding:10px 18px;border-radius:99px;font-size:14px;z-index:9;max-width:92%;text-align:center}
 </style>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0B5D44"><link rel="icon" type="image/png" href="favicon.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="../theme.css"><script src="../call.js"></script></head>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0B5D44"><link rel="icon" type="image/png" href="favicon.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="../theme.css"><script src="../call.js" defer></script></head>
 <body data-app="customer">
 
 <section id="auth" class="hide page" style="padding-top:18px">
@@ -368,6 +368,7 @@ function render0(){
  ${courierHtml(o)}
  ${rateHtml(o)}
  ${dist!==null?`<p class="u">المندوب يبعد عنك حوالي ${dist<1?Math.round(dist*1000)+' م':dist.toFixed(1)+' كم'}</p>`:''}
+ ${supportHtml()}
  ${o.courier_id?`<button class="cta chatb" onclick="openChat()">💬 راسل المندوب <span class="chat-dot ${CH.unread?'':'hide'}">${CH.unread}</span></button>`:''}
  <ul class="tl">${ST.map((x,k)=>`<li class="${k<i||o.status==='delivered'?'done':k===i?'on':''}"><i>${k<i||o.status==='delivered'?'✓':''}</i>${x}</li>`).join('')}</ul>
  <div class="sum">${o.order_items.map(x=>`<p><span>${esc(x.name)}</span><span>×${x.qty}</span></p>`).join('')}
@@ -658,6 +659,10 @@ async function loadCC(o){
  const r=await sb.rpc('order_courier_card',{p_order:o.id});
  if(!r.error&&r.data)CC[o.id]=r.data;
  if(order&&order.id===o.id)render0()}
+/* رقم الدعم الفني على واتساب بصيغة دولية بدون + (مثال 201012345678). اتركه فارغاً لإخفاء الزر */
+let SUPPORT_WA='966567252676';
+async function loadSupport(){try{const r=await sb.from('app_settings').select('value').eq('key','support_whatsapp').maybeSingle();if(!r.error&&r.data&&r.data.value)SUPPORT_WA=r.data.value.replace(/\D/g,'');if(order)render0()}catch(e){}}
+const supportHtml=()=>SUPPORT_WA?`<a class="cta sec" href="https://wa.me/${SUPPORT_WA}?text=${encodeURIComponent('مرحباً، أحتاج مساعدة في طلبي')}" target="_blank" rel="noopener">🛟 تواصل مع الدعم الفني</a>`:'';
 const courierHtml=o=>{const c=CC[o.id];if(!c)return '';
  return `<div class="crc">${c.avatar_url?`<img src="${esc(c.avatar_url)}" alt="">`:`<span class="crav">${esc((c.name||'م').trim().charAt(0))}</span>`}<div class="crt"><b>${esc(c.name||'المندوب')}</b><small>${VT[c.vehicle_type]||'مركبة'} · رقم ${esc(c.vehicle_plate||'غير مسجل')}</small></div>${c.phone?`<a class="crcall" href="tel:${esc(c.phone)}" title="اتصال بالمندوب">📞</a>`:''}<button class="crcall" onclick="JCall.start()" title="اتصال داخلي">🎧</button></div>`};
 
@@ -703,7 +708,7 @@ function mapGoTo(lat,lng){if(M)M.setView([lat,lng],17)}
 /* ---------- التشغيل ---------- */
 $('q').addEventListener('input',draw);
 if(SB_URL.startsWith('YOUR_')){go('auth');$('auth').innerHTML='<div class="empty"><div style="font-size:48px">⚙️</div><b>الإعداد مطلوب</b><p style="margin-top:8px">افتح الملف وضع SB_URL و SB_KEY من إعدادات Supabase في أعلى كود الصفحة.</p></div>'}
-else{window.__sbReady.then(function(){sb=supabase.createClient(SB_URL,SB_KEY);boot()}).catch(function(){})}
+else{window.__sbReady.then(function(){sb=supabase.createClient(SB_URL,SB_KEY);boot();loadSupport()}).catch(function(){})}
 </script>
 <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{})</script></body>
 </html>
