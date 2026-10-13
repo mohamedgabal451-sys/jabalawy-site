@@ -442,9 +442,11 @@ async function roleSave(id){
  closeM();toast('تم تحديث الدور');vTeam()}
 
 /* ---------- الإعدادات ---------- */
-function vSet(){
- $('main').innerHTML=`<div class="card"><b>المستودعات</b>${stores.map(s=>`<div class="row"><div class="t"><b>${esc(s.name)}</b><div class="u">نطاق التوصيل ${+s.radius_km} كم</div></div>
-  <span class="pill ${s.is_open?'':'off'}">${s.is_open?'مفتوح':'مغلق'}</span><button class="btn sec" onclick="sToggle('${s.id}')">${s.is_open?'إغلاق':'فتح'}</button><button class="btn sec" onclick="sForm('${s.id}')">تعديل</button><button class="btn sec" onclick="acctForm('${s.id}')">حساب الدخول</button></div>`).join('')}</div>
+async function vSet(){
+ const lg=await sb.from('warehouse_logins').select('*');
+ const logins=lg.data||[];
+ $('main').innerHTML=`<div class="card"><b>المستودعات</b>${stores.map(s=>{const ls=logins.filter(x=>x.store_id===s.id);return `<div class="row"><div class="t"><b>${esc(s.name)}</b><div class="u">نطاق التوصيل ${+s.radius_km} كم</div>${ls.map(x=>`<div class="u" dir="ltr" style="text-align:right">👤 ${esc(x.username)} · 🔑 ${esc(x.password)}</div>`).join('')||'<div class="u">لا يوجد حساب دخول</div>'}</div>
+  <span class="pill ${s.is_open?'':'off'}">${s.is_open?'مفتوح':'مغلق'}</span><button class="btn sec" onclick="sToggle('${s.id}')">${s.is_open?'إغلاق':'فتح'}</button><button class="btn sec" onclick="sForm('${s.id}')">تعديل</button><button class="btn sec" onclick="acctForm('${s.id}')">حساب الدخول</button></div>`}).join('')}</div>
  <div class="card"><b>الأقسام</b>${cats.map(c=>`<div class="row" style="padding-inline-start:${c.parent_id?26:0}px"><div class="e">${esc(c.emoji||'🗂️')}</div><div class="t">${c.parent_id?'↳ ':''}${esc(c.name)} <span class="u">${c.parent_id?'فرعي · ':'رئيسي · '}ترتيب ${c.sort_order}</span></div><button class="btn sec" onclick="cForm(${c.id})">تعديل</button></div>`).join('')}
  <button class="btn" style="margin-top:12px" onclick="cForm()">+ قسم جديد</button></div>`}
 async function sToggle(id){const s=stores.find(x=>x.id===id);
