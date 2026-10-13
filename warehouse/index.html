@@ -102,7 +102,7 @@ header h1{font-size:19px}header button{color:#b9d3c8;font-size:14px}
 /* ===== الإعدادات: نفس بيانات مشروع Supabase المستخدمة في تطبيق العميل ===== */
 const SB_URL='https://fektjanhxtmhzaiptdtt.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZla3RqYW5oeHRtaHphaXB0ZHR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExODQwMTAsImV4cCI6MjEwNjc2MDAxMH0.oRkTzZ03st-NTfZ3zioVjjC1Y_DPOKLb57n8pVfNYZA';
-const STORE='00000000-0000-0000-0000-000000000001';
+let STORE=null;
 /* ===================================================================== */
 
 const $=id=>document.getElementById(id);
@@ -130,9 +130,27 @@ async function boot(){
  const p=await sb.from('profiles').select('role,store_id').eq('id',session.user.id).single();
  if(p.error||!['staff','admin'].includes(p.data.role)){await sb.auth.signOut();$('login').classList.remove('hide');return toast('هذا الحساب غير مصرح له بدخول لوحة المستودع')}
  $('login').classList.add('hide');$('app').classList.remove('hide');
- const s=await sb.from('stores').select('name').eq('id',STORE).single();if(s.data)$('sname').textContent=s.data.name;
+ if(p.data.store_id){STORE=p.data.store_id}
+ else{const first=await sb.from('stores').select('id').eq('is_active',true).order('name').limit(1).single();STORE=first.data&&first.data.id}
+ if(p.data.role==='admin')await addStorePicker();
+ await loadStoreHeader();
  await Promise.all([loadOrders(),loadInv()]);
  subscribe();ready=true}
+async function loadStoreHeader(){
+ const s=await sb.from('stores').select('name').eq('id',STORE).single();if(s.data&&$('sname'))$('sname').textContent=s.data.name}
+async function addStorePicker(){
+ const all=await sb.from('stores').select('id,name').eq('is_active',true).order('name');
+ const sel=document.createElement('select');sel.id='storeSel';sel.setAttribute('aria-label','اختيار المستودع');
+ sel.style.cssText='font:inherit;font-size:13px;border:1px solid var(--line);border-radius:10px;padding:4px 8px;background:#fff;color:inherit;max-width:180px';
+ sel.innerHTML=(all.data||[]).map(x=>`<option value="${x.id}" ${x.id===STORE?'selected':''}>${esc(x.name)}</option>`).join('');
+ sel.onchange=()=>switchStore(sel.value);
+ const host=$('sname')&&$('sname').parentElement;if(host)host.appendChild(sel)}
+async function switchStore(id){
+ chs.forEach(c=>sb.removeChannel(c));chs=[];
+ STORE=id;orders=[];inv=[];checked={};couriers={};
+ await loadStoreHeader();
+ await Promise.all([loadOrders(),loadInv()]);
+ subscribe()}
 
 /* ---------- الطلبات ---------- */
 const SEL='*, order_items(id,name,qty,unavailable)';
